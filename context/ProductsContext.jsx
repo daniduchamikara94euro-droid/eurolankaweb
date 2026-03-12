@@ -14,6 +14,11 @@ const IMG = {
   hairpin:  'https://images.unsplash.com/photo-1549497538-303791108f95?auto=format&fit=crop&w=500&h=400&q=80',
   lock:     'https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=500&h=400&q=80',
   minimal:  'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=500&h=400&q=80',
+  rosegold: 'https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=500&h=400&q=80',
+  bronze:   'https://images.unsplash.com/photo-1600585152220-90363fe7e115?auto=format&fit=crop&w=500&h=400&q=80',
+  cuphinge: 'https://images.unsplash.com/photo-1572981779307-38b8cabb2407?auto=format&fit=crop&w=500&h=400&q=80',
+  slides:   'https://images.unsplash.com/photo-1556909172-54557c7e4fb7?auto=format&fit=crop&w=500&h=400&q=80',
+  rail:     'https://images.unsplash.com/photo-1558997519-83ea9252edf8?auto=format&fit=crop&w=500&h=400&q=80',
 }
 
 const SEED_PRODUCTS = [
@@ -23,10 +28,10 @@ const SEED_PRODUCTS = [
     description: 'Sleek stainless steel handles with brushed finish for modern kitchens and wardrobes.',
     variants: [
       { name: 'Finish', type: 'color', options: [
-        { label: 'Chrome',        hex: '#b8bfc7', img: IMG.silver   },
-        { label: 'Matte Black',   hex: '#2a2a2a', img: IMG.dark     },
-        { label: 'Gold',          hex: '#c9a84c', img: IMG.gold     },
-        { label: 'Brushed Nickel',hex: '#8c8c8c', img: IMG.hinges   },
+        { label: 'Chrome',        hex: '#b8bfc7', img: IMG.silver  },
+        { label: 'Matte Black',   hex: '#2a2a2a', img: IMG.dark    },
+        { label: 'Gold',          hex: '#c9a84c', img: IMG.gold    },
+        { label: 'Brushed Nickel',hex: '#8c8c8c', img: IMG.hinges  },
       ]},
       { name: 'Length', type: 'size', options: ['96mm', '128mm', '160mm', '192mm', '256mm'] },
     ],
@@ -37,10 +42,10 @@ const SEED_PRODUCTS = [
     description: 'Elegant gold-finish bar pulls that add a luxury touch to any cabinet or drawer.',
     variants: [
       { name: 'Finish', type: 'color', options: [
-        { label: 'Gold',     hex: '#c9a84c', img: IMG.gold      },
-        { label: 'Rose Gold',hex: '#b76e79', img: IMG.shelf     },
-        { label: 'Chrome',   hex: '#b8bfc7', img: IMG.silver    },
-        { label: 'Bronze',   hex: '#8b5e3c', img: IMG.furniture },
+        { label: 'Gold',     hex: '#c9a84c', img: IMG.gold     },
+        { label: 'Rose Gold',hex: '#b76e79', img: IMG.rosegold },
+        { label: 'Chrome',   hex: '#b8bfc7', img: IMG.silver   },
+        { label: 'Bronze',   hex: '#8b5e3c', img: IMG.bronze   },
       ]},
       { name: 'Length', type: 'size', options: ['128mm', '192mm', '256mm', '320mm', '480mm'] },
     ],
@@ -51,34 +56,34 @@ const SEED_PRODUCTS = [
     description: 'Hydraulic soft-close hinges that prevent slamming. Compatible with standard cabinet doors.',
     variants: [
       { name: 'Finish', type: 'color', options: [
-        { label: 'Chrome',     hex: '#b8bfc7', img: IMG.hinges },
-        { label: 'Nickel',     hex: '#a8a9ad', img: IMG.shelf  },
-        { label: 'Matte Black',hex: '#2a2a2a', img: IMG.dark   },
+        { label: 'Chrome',     hex: '#b8bfc7', img: IMG.hinges  },
+        { label: 'Nickel',     hex: '#a8a9ad', img: IMG.silver  },
+        { label: 'Matte Black',hex: '#2a2a2a', img: IMG.dark    },
       ]},
       { name: 'Overlay', type: 'type', options: ['Full Overlay', 'Half Overlay', 'Inset'] },
     ],
   },
   {
     id: 4, name: 'Concealed Cup Hinges', category: 'Hinges', emoji: '⚙️', price: 'LKR 320+',
-    img: IMG.dark,
+    img: IMG.cuphinge,
     description: 'Concealed cup hinges for a clean, seamless look on overlay and inset doors.',
     variants: [
       { name: 'Finish', type: 'color', options: [
-        { label: 'Chrome',     hex: '#b8bfc7', img: IMG.dark   },
-        { label: 'Nickel',     hex: '#a8a9ad', img: IMG.hinges },
-        { label: 'Matte Black',hex: '#2a2a2a', img: IMG.lock   },
+        { label: 'Chrome',     hex: '#b8bfc7', img: IMG.cuphinge },
+        { label: 'Nickel',     hex: '#a8a9ad', img: IMG.hinges   },
+        { label: 'Matte Black',hex: '#2a2a2a', img: IMG.dark     },
       ]},
       { name: 'Opening Angle', type: 'type', options: ['100°', '110°', '165°'] },
     ],
   },
   {
     id: 5, name: 'Full-Extension Drawer Slides', category: 'Slides', emoji: '📦', price: 'LKR 650+',
-    img: IMG.drawer,
+    img: IMG.slides,
     description: 'Full-extension ball-bearing slides with smooth, silent operation for any drawer.',
     variants: [
       { name: 'Finish', type: 'color', options: [
         { label: 'White', hex: '#e8e8e8', img: IMG.minimal },
-        { label: 'Silver',hex: '#c0c0c0', img: IMG.drawer  },
+        { label: 'Silver',hex: '#c0c0c0', img: IMG.slides  },
         { label: 'Black', hex: '#2a2a2a', img: IMG.dark    },
       ]},
       { name: 'Length', type: 'size', options: ['300mm', '350mm', '400mm', '450mm', '500mm', '600mm'] },
@@ -103,9 +108,9 @@ const SEED_PRODUCTS = [
     description: 'Complete wardrobe rail with brackets, end caps, and support systems.',
     variants: [
       { name: 'Finish', type: 'color', options: [
-        { label: 'Chrome',    hex: '#b8bfc7', img: IMG.wardrobe },
-        { label: 'Matte Black',hex: '#2a2a2a', img: IMG.dark    },
-        { label: 'Gold',      hex: '#c9a84c', img: IMG.gold     },
+        { label: 'Chrome',     hex: '#b8bfc7', img: IMG.rail     },
+        { label: 'Matte Black',hex: '#2a2a2a', img: IMG.dark     },
+        { label: 'Gold',       hex: '#c9a84c', img: IMG.gold     },
       ]},
       { name: 'Diameter', type: 'size', options: ['16mm', '19mm', '25mm'] },
     ],
@@ -130,10 +135,10 @@ const SEED_PRODUCTS = [
     description: 'Adjustable metal furniture legs in chrome, matte black, and gold finish.',
     variants: [
       { name: 'Finish', type: 'color', options: [
-        { label: 'Chrome',    hex: '#b8bfc7', img: IMG.furniture },
-        { label: 'Matte Black',hex: '#2a2a2a', img: IMG.dark     },
-        { label: 'Gold',      hex: '#c9a84c', img: IMG.gold      },
-        { label: 'Silver',    hex: '#c0c0c0', img: IMG.silver    },
+        { label: 'Chrome',     hex: '#b8bfc7', img: IMG.furniture },
+        { label: 'Matte Black',hex: '#2a2a2a', img: IMG.dark      },
+        { label: 'Gold',       hex: '#c9a84c', img: IMG.gold      },
+        { label: 'Silver',     hex: '#c0c0c0', img: IMG.silver    },
       ]},
       { name: 'Height', type: 'size', options: ['100mm', '150mm', '200mm', '250mm'] },
       { name: 'Shape', type: 'type', options: ['Round', 'Square', 'Tapered'] },
@@ -145,10 +150,10 @@ const SEED_PRODUCTS = [
     description: 'Industrial-style hairpin legs in steel — perfect for tables and benches.',
     variants: [
       { name: 'Finish', type: 'color', options: [
-        { label: 'Black', hex: '#1a1a1a', img: IMG.hairpin   },
-        { label: 'Chrome',hex: '#b8bfc7', img: IMG.silver    },
-        { label: 'Copper',hex: '#b87333', img: IMG.furniture },
-        { label: 'White', hex: '#e8e8e8', img: IMG.minimal   },
+        { label: 'Black', hex: '#1a1a1a', img: IMG.hairpin  },
+        { label: 'Chrome',hex: '#b8bfc7', img: IMG.silver   },
+        { label: 'Copper',hex: '#b87333', img: IMG.bronze   },
+        { label: 'White', hex: '#e8e8e8', img: IMG.minimal  },
       ]},
       { name: 'Height', type: 'size', options: ['200mm', '400mm', '710mm'] },
       { name: 'Pins', type: 'type', options: ['2-Pin', '3-Pin'] },
