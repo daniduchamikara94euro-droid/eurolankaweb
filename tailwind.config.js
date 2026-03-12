@@ -1,6 +1,10 @@
 /** @type {import('tailwindcss').Config} */
-export default {
-  content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
+module.exports = {
+  content: [
+    './app/**/*.{js,jsx,ts,tsx}',
+    './components/**/*.{js,jsx,ts,tsx}',
+    './context/**/*.{js,jsx,ts,tsx}',
+  ],
   theme: {
     extend: {
       colors: {
@@ -13,7 +17,6 @@ export default {
       animation: {
         float: 'float 6s ease-in-out infinite',
         'float-slow': 'float 9s ease-in-out infinite',
-        'counter-up': 'counterUp 1s ease-out forwards',
       },
       keyframes: {
         float: {
@@ -21,9 +24,7 @@ export default {
           '50%': { transform: 'translateY(-20px)' },
         },
       },
-      backdropBlur: {
-        xs: '2px',
-      },
+      backdropBlur: { xs: '2px' },
     },
   },
   plugins: [],
