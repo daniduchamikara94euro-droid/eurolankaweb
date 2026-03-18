@@ -19,12 +19,14 @@ export default function ProductModal({ product, onClose }) {
   const [imgError, setImgError] = useState(false)
   const [activeImg, setActiveImg] = useState(product?.img)
   const [selected, setSelected] = useState(() => buildInitialSelected(product))
+  const [lastChanged, setLastChanged] = useState(null)
 
   useEffect(() => {
     if (!product) return
     setActiveImg(product.img)
     setImgError(false)
     setSelected(buildInitialSelected(product))
+    setLastChanged(null)
   }, [product])
 
   useEffect(() => {
@@ -39,6 +41,7 @@ export default function ProductModal({ product, onClose }) {
 
   const handleColorSelect = (variantName, opt) => {
     setSelected((s) => ({ ...s, [variantName]: opt.label }))
+    setLastChanged(variantName)
     setImgError(false)
     setActiveImg(opt.img || product.img)
   }
@@ -81,16 +84,30 @@ export default function ProductModal({ product, onClose }) {
               <h2 className="text-2xl font-black text-white leading-tight">{product.name}</h2>
 
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-black gradient-text">{(() => {
-                  if (!product?.variants) return product?.price
-                  for (const v of product.variants) {
+                {(() => {
+                  if (!product?.variants?.length) return (
+                    <span className="text-3xl font-black gradient-text">{product?.price}</span>
+                  )
+                  const variants = lastChanged
+                    ? [product.variants.find(v => v.name === lastChanged), ...product.variants.filter(v => v.name !== lastChanged)].filter(Boolean)
+                    : product.variants
+                  let price = product?.price
+                  for (const v of variants) {
                     const selVal = selected[v.name]
                     const opt = v.options.find(o => (v.type === 'color' ? o.label : getOptValue(o)) === selVal)
                     const p = getOptPrice(opt)
-                    if (p) return p
+                    if (p) { price = p; break }
                   }
-                  return product?.price
-                })()}</span>
+                  return (
+                    <AnimatePresence mode="wait">
+                      <motion.span key={price} className="text-3xl font-black gradient-text"
+                        initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
+                        transition={{ duration: 0.18 }}>
+                        {price}
+                      </motion.span>
+                    </AnimatePresence>
+                  )
+                })()}
                 <span className="text-slate-500 text-sm">/ unit</span>
               </div>
 
@@ -146,7 +163,7 @@ export default function ProductModal({ product, onClose }) {
                           const disabled = isOptDisabled(opt)
                           const isActive = selected[variant.name] === val
                           return (
-                            <button key={val} onClick={() => !disabled && setSelected((s) => ({ ...s, [variant.name]: val }))}
+                            <button key={val} onClick={() => { if (!disabled) { setSelected((s) => ({ ...s, [variant.name]: val })); setLastChanged(variant.name) } }}
                               className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all duration-200 ${
                                 disabled ? 'border-white/5 text-slate-600 cursor-not-allowed line-through'
                                   : isActive ? 'bg-sky-500 border-sky-400 text-white shadow-lg shadow-sky-500/25'
@@ -164,7 +181,7 @@ export default function ProductModal({ product, onClose }) {
                           const disabled = isOptDisabled(opt)
                           const isActive = selected[variant.name] === val
                           return (
-                            <button key={val} onClick={() => !disabled && setSelected((s) => ({ ...s, [variant.name]: val }))}
+                            <button key={val} onClick={() => { if (!disabled) { setSelected((s) => ({ ...s, [variant.name]: val })); setLastChanged(variant.name) } }}
                               className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all duration-200 ${
                                 disabled ? 'border-white/5 text-slate-600 cursor-not-allowed line-through'
                                   : isActive ? 'bg-gradient-to-r from-sky-500 to-blue-600 border-transparent text-white shadow-lg shadow-sky-500/25'

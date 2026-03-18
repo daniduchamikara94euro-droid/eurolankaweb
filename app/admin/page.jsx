@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useProducts } from '@/context/ProductsContext'
 import ProductCard from '@/components/ProductCard'
@@ -59,6 +59,108 @@ function PinScreen({ onAuth }) {
   )
 }
 
+/* ── Compact image picker for variant options ── */
+function VariantImagePicker({ value, onChange }) {
+  const [mode, setMode] = useState(null) // null | 'upload' | 'url'
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  const inputRef = useRef(null)
+
+  const processFile = async (file) => {
+    if (!file) return
+    setError('')
+    setBusy(true)
+    try {
+      const blob = await cropToBlob(file)
+      const fd = new FormData()
+      fd.append('file', blob, 'variant.jpg')
+      const res = await fetch('/api/upload', { method: 'POST', body: fd })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Upload failed')
+      onChange(data.url)
+      setMode(null)
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  // collapsed: show thumbnail or "add image" pill
+  if (mode === null) {
+    return (
+      <div className="flex items-center gap-1.5 flex-1 min-w-0">
+        {value ? (
+          <>
+            <img src={value} alt="" className="w-8 h-6 object-cover rounded border border-white/10 flex-shrink-0" />
+            <button type="button" onClick={() => setMode('upload')}
+              className="text-xs text-slate-500 hover:text-sky-400 transition-colors truncate">change</button>
+            <button type="button" onClick={() => onChange('')}
+              className="text-slate-600 hover:text-red-400 text-xs transition-colors flex-shrink-0">✕</button>
+          </>
+        ) : (
+          <button type="button" onClick={() => setMode('upload')}
+            className="px-2 py-1 rounded-lg text-xs border border-dashed border-white/15 text-slate-500 hover:border-sky-500/40 hover:text-sky-400 transition-colors whitespace-nowrap">
+            + image
+          </button>
+        )}
+      </div>
+    )
+  }
+
+  // expanded: upload or url panel
+  return (
+    <div className="col-span-full mt-1 space-y-1.5">
+      <div className="flex gap-2 items-center">
+        <div className="flex rounded-lg overflow-hidden border border-white/10 text-xs">
+          <button type="button" onClick={() => setMode('upload')}
+            className={`px-2.5 py-1 transition-colors ${mode === 'upload' ? 'bg-sky-500/20 text-sky-400' : 'text-slate-500 hover:text-slate-300'}`}>
+            Upload
+          </button>
+          <button type="button" onClick={() => setMode('url')}
+            className={`px-2.5 py-1 transition-colors ${mode === 'url' ? 'bg-sky-500/20 text-sky-400' : 'text-slate-500 hover:text-slate-300'}`}>
+            URL
+          </button>
+        </div>
+        <button type="button" onClick={() => setMode(null)} className="text-slate-600 hover:text-slate-400 text-xs transition-colors">cancel</button>
+      </div>
+
+      {mode === 'upload' ? (
+        <div
+          onClick={() => !busy && inputRef.current?.click()}
+          className={`flex items-center gap-3 px-3 py-2 rounded-lg border border-dashed cursor-pointer transition-colors ${busy ? 'cursor-wait border-sky-500/40 bg-sky-500/5' : 'border-white/15 hover:border-sky-500/40 bg-white/3'}`}
+        >
+          <input ref={inputRef} type="file" accept="image/*" className="hidden"
+            onChange={e => { processFile(e.target.files[0]); e.target.value = '' }} />
+          {busy ? (
+            <>
+              <div className="w-4 h-4 border-2 border-sky-400 border-t-transparent rounded-full animate-spin flex-shrink-0" />
+              <span className="text-sky-400 text-xs">Uploading…</span>
+            </>
+          ) : (
+            <>
+              <span className="text-lg">🖼️</span>
+              <span className="text-slate-400 text-xs">Click to pick image — auto-cropped to {CARD_W}×{CARD_H}</span>
+            </>
+          )}
+        </div>
+      ) : (
+        <div className="flex gap-2 items-center">
+          <input type="text" defaultValue={value} placeholder="https://..."
+            className="flex-1 px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-sky-500/60"
+            onBlur={e => { onChange(e.target.value); setMode(null) }}
+            onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onChange(e.target.value); setMode(null) } }}
+            autoFocus
+          />
+          <span className="text-slate-600 text-xs whitespace-nowrap">Enter to save</span>
+        </div>
+      )}
+
+      {error && <p className="text-red-400 text-xs">{error}</p>}
+    </div>
+  )
+}
+
 /* ── Variant Builder ── */
 function VariantBuilder({ variants, onChange }) {
   const addVariant = () => onChange([...variants, { name: '', type: 'color', options: [] }])
@@ -106,15 +208,14 @@ function VariantBuilder({ variants, onChange }) {
 
           <div className="space-y-2 pl-2">
             {v.options.map((opt, oi) => (
-              <div key={oi} className="flex gap-2 items-center">
+              <div key={oi} className="flex flex-wrap gap-2 items-center">
                 {v.type === 'color' ? (
                   <>
                     <input type="text" value={opt.label} onChange={e => updateOption(vi, oi, { ...opt, label: e.target.value })}
                       placeholder="Label" className="w-20 px-2 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-sky-500/60 flex-shrink-0" />
                     <input type="color" value={opt.hex} onChange={e => updateOption(vi, oi, { ...opt, hex: e.target.value })}
                       className="w-8 h-[30px] rounded cursor-pointer bg-transparent border border-white/10 flex-shrink-0" title="Hex color" />
-                    <input type="text" value={opt.img} onChange={e => updateOption(vi, oi, { ...opt, img: e.target.value })}
-                      placeholder="Image URL" className="flex-1 min-w-0 px-2 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-sky-500/60" />
+                    <VariantImagePicker value={opt.img ?? ''} onChange={val => updateOption(vi, oi, { ...opt, img: val })} />
                     <input type="text" value={opt.price ?? ''} onChange={e => updateOption(vi, oi, { ...opt, price: e.target.value })}
                       placeholder="Price" className="w-20 px-2 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-sky-500/60 flex-shrink-0" />
                     <button type="button" title={opt.disabled ? 'Mark as available' : 'Mark as out of stock'}
@@ -155,6 +256,148 @@ function VariantBuilder({ variants, onChange }) {
       {variants.length === 0 && (
         <p className="text-slate-600 text-xs italic">No variants yet. Click "Add Variant" to create one.</p>
       )}
+    </div>
+  )
+}
+
+/* ── Image Uploader ── */
+const MAX_FILE_MB = 10
+const CARD_W = 600
+const CARD_H = 450
+
+// Crop to card dimensions client-side, then return a Blob ready for upload
+function cropToBlob(file) {
+  return new Promise((resolve, reject) => {
+    if (file.size > MAX_FILE_MB * 1024 * 1024) {
+      return reject(new Error(`File too large. Max ${MAX_FILE_MB} MB.`))
+    }
+    const reader = new FileReader()
+    reader.onerror = () => reject(new Error('Could not read file'))
+    reader.onload = (e) => {
+      const img = new Image()
+      img.onerror = () => reject(new Error('Invalid image'))
+      img.onload = () => {
+        const srcRatio = img.width / img.height
+        const dstRatio = CARD_W / CARD_H
+        let sx, sy, sw, sh
+        if (srcRatio > dstRatio) {
+          sh = img.height; sw = sh * dstRatio; sy = 0; sx = (img.width - sw) / 2
+        } else {
+          sw = img.width; sh = sw / dstRatio; sx = 0; sy = (img.height - sh) / 2
+        }
+        const canvas = document.createElement('canvas')
+        canvas.width = CARD_W; canvas.height = CARD_H
+        canvas.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, CARD_W, CARD_H)
+        canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Canvas export failed')), 'image/jpeg', 0.80)
+      }
+      img.src = e.target.result
+    }
+    reader.readAsDataURL(file)
+  })
+}
+
+function ImageUploader({ value, onChange }) {
+  const [dragging, setDragging] = useState(false)
+  const [status, setStatus] = useState('idle') // idle | cropping | uploading
+  const [error, setError] = useState('')
+  const [tab, setTab] = useState(!value || value.includes('blob.vercel-storage.com') ? 'upload' : 'url')
+  const inputRef = useRef(null)
+
+  const processFile = async (file) => {
+    if (!file) return
+    setError('')
+    try {
+      setStatus('cropping')
+      const blob = await cropToBlob(file)
+
+      setStatus('uploading')
+      const fd = new FormData()
+      fd.append('file', blob, 'product.jpg')
+      const res = await fetch('/api/upload', { method: 'POST', body: fd })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Upload failed')
+
+      onChange(data.url)
+      setTab('upload')
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setStatus('idle')
+    }
+  }
+
+  const onDrop = (e) => {
+    e.preventDefault(); setDragging(false)
+    const file = e.dataTransfer.files[0]
+    if (file) processFile(file)
+  }
+
+  const busy = status !== 'idle'
+  const statusLabel = status === 'cropping' ? 'Cropping & compressing…' : 'Uploading to Vercel Blob…'
+  const isBlobUrl = value?.includes('blob.vercel-storage.com')
+
+  return (
+    <div className="space-y-2">
+      <div className="flex gap-2 mb-2">
+        <button type="button" onClick={() => setTab('upload')}
+          className={`px-3 py-1 rounded-lg text-xs font-semibold border transition-colors ${tab === 'upload' ? 'bg-sky-500/20 text-sky-400 border-sky-500/30' : 'text-slate-500 border-white/10 hover:text-slate-300'}`}>
+          Upload File
+        </button>
+        <button type="button" onClick={() => setTab('url')}
+          className={`px-3 py-1 rounded-lg text-xs font-semibold border transition-colors ${tab === 'url' ? 'bg-sky-500/20 text-sky-400 border-sky-500/30' : 'text-slate-500 border-white/10 hover:text-slate-300'}`}>
+          Image URL
+        </button>
+      </div>
+
+      {tab === 'upload' ? (
+        <div
+          onDragOver={e => { e.preventDefault(); setDragging(true) }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={onDrop}
+          onClick={() => !busy && inputRef.current?.click()}
+          className={`relative rounded-xl border-2 border-dashed transition-colors ${busy ? 'cursor-wait' : 'cursor-pointer'} ${dragging ? 'border-sky-400 bg-sky-500/10' : 'border-white/15 hover:border-sky-500/50 bg-white/3'}`}
+          style={{ minHeight: '110px' }}
+        >
+          <input ref={inputRef} type="file" accept="image/*" className="hidden"
+            onChange={e => { processFile(e.target.files[0]); e.target.value = '' }} />
+
+          {busy ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+              <div className="w-6 h-6 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
+              <span className="text-sky-400 text-xs font-medium">{statusLabel}</span>
+            </div>
+          ) : value ? (
+            <div className="flex items-center gap-4 p-3">
+              <img src={value} alt="preview" className="w-20 h-16 object-cover rounded-lg border border-white/10 flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-white text-xs font-medium">{CARD_W}×{CARD_H}px · JPEG</p>
+                <p className="text-slate-500 text-xs mt-0.5">
+                  {isBlobUrl ? 'Stored on Vercel Blob · ' : ''}Click or drag to replace
+                </p>
+              </div>
+              <button type="button" onClick={e => { e.stopPropagation(); onChange('') }}
+                className="text-slate-500 hover:text-red-400 text-sm px-2 transition-colors flex-shrink-0">✕</button>
+            </div>
+          ) : (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 text-center px-4">
+              <span className="text-3xl">🖼️</span>
+              <p className="text-slate-400 text-xs font-medium">Click or drag & drop image</p>
+              <p className="text-slate-600 text-xs">Auto-cropped to {CARD_W}×{CARD_H} · Max {MAX_FILE_MB} MB</p>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="flex gap-2 items-center">
+          <input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder="https://..."
+            className="flex-1 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-sky-500/60 transition-colors text-sm" />
+          {value && (
+            <img src={value} alt="preview" className="w-10 h-10 object-cover rounded-lg border border-white/10 flex-shrink-0"
+              onError={e => { e.target.style.display = 'none' }} />
+          )}
+        </div>
+      )}
+
+      {error && <p className="text-red-400 text-xs">{error}</p>}
     </div>
   )
 }
@@ -214,9 +457,8 @@ function ProductForm({ initial, onSave, onCancel, allProducts }) {
               className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-sky-500/60 transition-colors" />
           </div>
           <div className="col-span-2">
-            <label className="block text-xs font-semibold text-slate-400 mb-1">Image URL</label>
-            <input type="text" value={form.img} onChange={e => set('img', e.target.value)} placeholder="https://..."
-              className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-sky-500/60 transition-colors" />
+            <label className="block text-xs font-semibold text-slate-400 mb-1">Product Image</label>
+            <ImageUploader value={form.img} onChange={val => set('img', val)} />
           </div>
           <div className="col-span-2">
             <label className="block text-xs font-semibold text-slate-400 mb-1">Description</label>
