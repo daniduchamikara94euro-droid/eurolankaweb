@@ -193,23 +193,19 @@ const SEED_FEATURED = [1, 3, 5, 7]
 const ProductsContext = createContext(null)
 
 export function ProductsProvider({ children }) {
-  const [products, setProducts] = useState(() => {
-    try {
-      const stored = typeof window !== 'undefined' ? localStorage.getItem('elw_products') : null
-      return stored ? JSON.parse(stored) : SEED_PRODUCTS
-    } catch {
-      return SEED_PRODUCTS
-    }
-  })
+  // Always start with seed data (server + client match = no hydration mismatch)
+  const [products, setProducts] = useState(SEED_PRODUCTS)
+  const [featuredIds, setFeaturedIds] = useState(SEED_FEATURED)
 
-  const [featuredIds, setFeaturedIds] = useState(() => {
+  // Load from localStorage after hydration
+  useEffect(() => {
     try {
-      const stored = typeof window !== 'undefined' ? localStorage.getItem('elw_featured') : null
-      return stored ? JSON.parse(stored) : SEED_FEATURED
-    } catch {
-      return SEED_FEATURED
-    }
-  })
+      const storedProducts = localStorage.getItem('elw_products')
+      if (storedProducts) setProducts(JSON.parse(storedProducts))
+      const storedFeatured = localStorage.getItem('elw_featured')
+      if (storedFeatured) setFeaturedIds(JSON.parse(storedFeatured))
+    } catch {}
+  }, [])
 
   useEffect(() => {
     localStorage.setItem('elw_products', JSON.stringify(products))

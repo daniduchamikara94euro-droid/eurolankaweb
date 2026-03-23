@@ -42,7 +42,13 @@ function useCounter(target, duration = 2000) {
 function StatItem({ label, value, suffix }) {
   const { count, start } = useCounter(value)
   return (
-    <motion.div className="text-center" whileInView={() => { start(); return {} }} viewport={{ once: true }}>
+    <motion.div
+      className="text-center"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      onViewportEnter={() => start()}
+      viewport={{ once: true }}
+    >
       <div className="text-5xl font-black gradient-text mb-2">{count}{suffix}</div>
       <div className="text-slate-500 text-xs uppercase tracking-widest">{label}</div>
     </motion.div>
