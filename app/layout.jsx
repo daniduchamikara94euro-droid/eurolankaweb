@@ -9,6 +9,11 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        {/* TEMP: mobile debug console — remove after fixing */}
+        <script src="https://cdn.jsdelivr.net/npm/eruda" />
+        <script dangerouslySetInnerHTML={{ __html: 'eruda.init()' }} />
+      </head>
       <body>
         <ProductsProvider>
           {children}
