@@ -5,10 +5,12 @@ export default function CustomCursor() {
   const dot  = useRef(null)
   const ring = useRef(null)
   const [hovering, setHovering] = useState(false)
+  const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    // Only show on devices that support hover (not touch/mobile)
     if (window.matchMedia('(hover: none)').matches) return
+    setVisible(true)
 
     document.body.style.cursor = 'none'
     const onMove = (e) => {
@@ -26,7 +28,7 @@ export default function CustomCursor() {
     }
   }, [])
 
-  if (typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches) return null
+  if (!visible) return null
 
   return (
     <>

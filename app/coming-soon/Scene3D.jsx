@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useMemo, useEffect } from 'react';
+import { useRef, useMemo, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Points, PointMaterial, Environment } from '@react-three/drei';
 import * as THREE from 'three';
@@ -293,7 +293,12 @@ function Scene() {
 // EXPORT
 // ─────────────────────────────────────────────────────────────────────────────
 export default function Scene3D() {
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+  }, []);
+
   return (
     <Canvas
       camera={{ position: [0, 0, isMobile ? 10 : 6], fov: isMobile ? 65 : 55 }}
