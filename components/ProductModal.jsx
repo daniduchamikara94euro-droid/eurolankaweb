@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-const getOptValue = (opt) => typeof opt === 'string' ? opt : opt.value
+const getOptValue = (opt) => { if (!opt) return ''; return typeof opt === 'string' ? opt : (opt.value ?? '') }
 const getOptPrice = (opt) => typeof opt === 'object' && opt && opt.price && opt.price.trim() !== '' ? opt.price.trim() : null
 const isOptDisabled = (opt) => typeof opt === 'object' && opt && opt.disabled === true
 
@@ -50,20 +50,26 @@ export default function ProductModal({ product, onClose }) {
 
   return (
     <AnimatePresence>
-      <motion.div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      <motion.div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
         <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
-        <motion.div className="relative z-10 w-full max-w-3xl glass-card overflow-hidden max-h-[90vh] flex flex-col"
-          initial={{ opacity: 0, y: 40, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 30, scale: 0.97 }} transition={{ duration: 0.3, ease: 'easeOut' }}
+        <motion.div className="relative z-10 w-full sm:max-w-3xl glass-card overflow-hidden max-h-[92vh] sm:max-h-[90vh] flex flex-col rounded-t-2xl sm:rounded-2xl"
+          initial={{ opacity: 0, y: 60 }} animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 60 }} transition={{ duration: 0.3, ease: 'easeOut' }}
           onClick={(e) => e.stopPropagation()}>
+
+          {/* Mobile drag handle */}
+          <div className="sm:hidden flex justify-center pt-3 pb-1">
+            <div className="w-10 h-1 rounded-full bg-white/20" />
+          </div>
+
           <button onClick={onClose}
-            className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full glass border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-sky-500/40 transition-all duration-200"
+            className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full glass border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-sky-500/40 transition-all duration-200 text-lg"
             aria-label="Close">✕</button>
 
-          <div className="flex flex-col sm:flex-row overflow-y-auto">
-            <div className="relative sm:w-2/5 h-64 sm:h-auto flex-shrink-0 overflow-hidden bg-gradient-to-br from-sky-900/40 to-blue-900/40">
+          <div className="flex flex-col sm:flex-row overflow-y-auto overscroll-contain">
+            <div className="relative sm:w-2/5 h-56 sm:h-auto flex-shrink-0 overflow-hidden bg-gradient-to-br from-sky-900/40 to-blue-900/40">
               <AnimatePresence mode="wait">
                 <motion.div key={activeImg} className="absolute inset-0"
                   initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
@@ -77,7 +83,7 @@ export default function ProductModal({ product, onClose }) {
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent sm:bg-gradient-to-r sm:from-transparent sm:to-black/20 pointer-events-none" />
             </div>
 
-            <div className="flex-1 p-7 flex flex-col gap-4 overflow-y-auto">
+            <div className="flex-1 p-5 sm:p-7 flex flex-col gap-4 overflow-y-auto">
               <span className="self-start px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/15 text-sky-300 border border-sky-500/30">
                 {product.category}
               </span>

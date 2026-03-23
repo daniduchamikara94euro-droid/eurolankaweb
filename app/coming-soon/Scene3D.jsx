@@ -196,7 +196,7 @@ function SmallHinge({ position, scale = 0.5, speed = 1 }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // PARTICLES
 // ─────────────────────────────────────────────────────────────────────────────
-function Particles({ count = 1500 }) {
+function Particles({ count = 800 }) {
   const ref = useRef();
   const positions = useMemo(() => {
     const arr = new Float32Array(count * 3);
@@ -293,12 +293,13 @@ function Scene() {
 // EXPORT
 // ─────────────────────────────────────────────────────────────────────────────
 export default function Scene3D() {
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
   return (
     <Canvas
-      camera={{ position: [0, 0, 6], fov: 55 }}
-      gl={{ antialias: true, alpha: true }}
+      camera={{ position: [0, 0, isMobile ? 10 : 6], fov: isMobile ? 65 : 55 }}
+      gl={{ antialias: !isMobile, alpha: true, powerPreference: 'high-performance' }}
       style={{ position: 'absolute', inset: 0 }}
-      dpr={[1, 1.5]}
+      dpr={isMobile ? 1 : [1, 1.5]}
     >
       <Scene />
     </Canvas>

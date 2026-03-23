@@ -15,7 +15,7 @@ export default function Products() {
   const filtered = active === 'All' ? products : products.filter((p) => p.category === active)
 
   return (
-    <div className="min-h-screen pt-24 pb-20 px-6">
+    <div className="min-h-screen pt-20 pb-20 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
         <ScrollReveal>
           <h1 className="section-heading gradient-text">Our Products</h1>
