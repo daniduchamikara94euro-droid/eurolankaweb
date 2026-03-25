@@ -56,6 +56,10 @@ function StatItem({ label, value, suffix }) {
 }
 
 function Hero() {
+  return <HeroVisual />
+}
+
+function _OldHero() {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden" style={{ background: '#020810' }}>
       <div className="absolute inset-0 bg-grid" />
@@ -156,6 +160,7 @@ function Hero() {
       </motion.div>
     </section>
   )
+// eslint-disable-next-line no-unreachable
 }
 
 export default function Home() {
