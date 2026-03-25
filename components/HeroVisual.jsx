@@ -1,5 +1,12 @@
 'use client'
 import { motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
+
+const DEFAULTS = {
+  main:  { img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=700&h=380&q=85', title: 'Premium Cabinet Handles', subtitle: 'Stainless Steel · Brushed Finish', price: 'LKR 450+' },
+  card1: { img: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=300&h=160&q=80', title: 'Soft-Close Hinges', price: 'LKR 280+' },
+  card2: { img: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=300&h=160&q=80', title: 'Furniture Legs', price: 'LKR 980+' },
+}
 
 function FloatCard({ children, delay = 0, className = '', style = {} }) {
   return (
@@ -35,6 +42,19 @@ function StatPill({ value, label, color, delay }) {
 }
 
 export default function HeroVisual() {
+  const [hero, setHero] = useState(DEFAULTS)
+
+  useEffect(() => {
+    fetch('/api/hero')
+      .then(r => r.json())
+      .then(({ hero }) => { if (hero) setHero({ ...DEFAULTS, ...hero }) })
+      .catch(() => {})
+  }, [])
+
+  const main  = { ...DEFAULTS.main,  ...hero?.main  }
+  const card1 = { ...DEFAULTS.card1, ...hero?.card1 }
+  const card2 = { ...DEFAULTS.card2, ...hero?.card2 }
+
   return (
     <div className="relative w-full h-full select-none" style={{ perspective: '1000px' }}>
       <div className="absolute rounded-full pointer-events-none"
@@ -43,16 +63,15 @@ export default function HeroVisual() {
       <FloatCard delay={0.1} className="absolute" style={{ top: '5%', left: '8%', right: '8%' }}>
         <div className="rounded-2xl overflow-hidden"
           style={{ transform: 'rotateX(4deg) rotateY(-6deg)', boxShadow: '0 30px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(14,165,233,0.2), 0 0 60px rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.2)' }}>
-          <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=700&h=380&q=85"
-            alt="Premium Cabinet Hardware" className="w-full object-cover" style={{ height: '220px', display: 'block', filter: 'brightness(0.8) contrast(1.05)' }} />
+          <img src={main.img} alt={main.title} className="w-full object-cover" style={{ height: '220px', display: 'block', filter: 'brightness(0.8) contrast(1.05)' }} />
           <div className="absolute bottom-0 left-0 right-0 p-4" style={{ background: 'linear-gradient(to top, rgba(2,8,16,0.95) 0%, transparent 100%)' }}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-white font-bold text-sm">Premium Cabinet Handles</p>
-                <p className="text-slate-400 text-xs">Stainless Steel · Brushed Finish</p>
+                <p className="text-white font-bold text-sm">{main.title}</p>
+                <p className="text-slate-400 text-xs">{main.subtitle}</p>
               </div>
               <div className="px-3 py-1 rounded-lg text-xs font-bold text-sky-400" style={{ background: 'rgba(14,165,233,0.15)', border: '1px solid rgba(14,165,233,0.3)' }}>
-                LKR 450+
+                {main.price}
               </div>
             </div>
           </div>
@@ -63,22 +82,20 @@ export default function HeroVisual() {
         <FloatCard delay={0.3} className="flex-1">
           <div className="rounded-xl overflow-hidden"
             style={{ transform: 'rotateX(2deg) rotateY(4deg)', boxShadow: '0 20px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(129,140,248,0.25)', border: '1px solid rgba(129,140,248,0.2)' }}>
-            <img src="https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=300&h=160&q=80"
-              alt="Soft-Close Hinges" className="w-full object-cover" style={{ height: '110px', display: 'block', filter: 'brightness(0.75)' }} />
+            <img src={card1.img} alt={card1.title} className="w-full object-cover" style={{ height: '110px', display: 'block', filter: 'brightness(0.75)' }} />
             <div className="px-3 py-2" style={{ background: 'rgba(2,8,16,0.95)' }}>
-              <p className="text-white text-xs font-semibold">Soft-Close Hinges</p>
-              <p className="text-indigo-400 text-[10px]">LKR 280+</p>
+              <p className="text-white text-xs font-semibold">{card1.title}</p>
+              <p className="text-indigo-400 text-[10px]">{card1.price}</p>
             </div>
           </div>
         </FloatCard>
         <FloatCard delay={0.45} className="flex-1">
           <div className="rounded-xl overflow-hidden"
             style={{ transform: 'rotateX(2deg) rotateY(-3deg)', boxShadow: '0 20px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(168,85,247,0.25)', border: '1px solid rgba(168,85,247,0.2)' }}>
-            <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=300&h=160&q=80"
-              alt="Furniture Legs" className="w-full object-cover" style={{ height: '110px', display: 'block', filter: 'brightness(0.75)' }} />
+            <img src={card2.img} alt={card2.title} className="w-full object-cover" style={{ height: '110px', display: 'block', filter: 'brightness(0.75)' }} />
             <div className="px-3 py-2" style={{ background: 'rgba(2,8,16,0.95)' }}>
-              <p className="text-white text-xs font-semibold">Furniture Legs</p>
-              <p className="text-purple-400 text-[10px]">LKR 980+</p>
+              <p className="text-white text-xs font-semibold">{card2.title}</p>
+              <p className="text-purple-400 text-[10px]">{card2.price}</p>
             </div>
           </div>
         </FloatCard>

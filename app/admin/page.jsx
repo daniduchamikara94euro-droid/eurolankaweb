@@ -704,6 +704,172 @@ function GalleryManager({ showToast }) {
   )
 }
 
+/* ── Hero Cards Manager ── */
+function HeroCardSpot({ label, aspectClass, data, onUpload, onField, busy }) {
+  const inputRef = useRef(null)
+  return (
+    <div className="space-y-3">
+      <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{label}</p>
+
+      {/* image spot */}
+      <div
+        className={`relative rounded-2xl overflow-hidden border-2 cursor-pointer group transition-all duration-200 ${data.img ? 'border-white/10 hover:border-sky-500/40' : 'border-dashed border-white/15 hover:border-sky-500/50 hover:bg-sky-500/5'} ${aspectClass}`}
+        onClick={() => !busy && inputRef.current?.click()}
+      >
+        {data.img ? (
+          <>
+            <img src={data.img} alt={data.title} className="w-full h-full object-cover brightness-75 group-hover:brightness-90 transition-all duration-300" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="bg-black/60 px-4 py-2 rounded-xl text-white text-sm font-semibold">📷 Replace</div>
+            </div>
+          </>
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+            {busy ? (
+              <div className="w-8 h-8 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <>
+                <div className="w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-2xl">📷</div>
+                <span className="text-slate-500 text-sm font-medium">Click to upload</span>
+              </>
+            )}
+          </div>
+        )}
+        {busy && data.img && (
+          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+            <div className="w-8 h-8 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
+          </div>
+        )}
+        <input ref={inputRef} type="file" accept="image/*" className="hidden"
+          onChange={e => { onUpload(e.target.files[0]); e.target.value = '' }} />
+      </div>
+
+      {/* editable fields */}
+      <div className="space-y-2">
+        <input type="text" value={data.title || ''} onChange={e => onField('title', e.target.value)}
+          placeholder="Title (e.g. Premium Cabinet Handles)"
+          className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-sky-500/60 placeholder-slate-600" />
+        {'subtitle' in data && (
+          <input type="text" value={data.subtitle || ''} onChange={e => onField('subtitle', e.target.value)}
+            placeholder="Subtitle (e.g. Stainless Steel · Brushed Finish)"
+            className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-sky-500/60 placeholder-slate-600" />
+        )}
+        <input type="text" value={data.price || ''} onChange={e => onField('price', e.target.value)}
+          placeholder="Price (e.g. LKR 450+)"
+          className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-sky-500/60 placeholder-slate-600" />
+      </div>
+    </div>
+  )
+}
+
+const HERO_DEFAULTS = {
+  main:  { img: '', title: 'Premium Cabinet Handles', subtitle: 'Stainless Steel · Brushed Finish', price: 'LKR 450+' },
+  card1: { img: '', title: 'Soft-Close Hinges', price: 'LKR 280+' },
+  card2: { img: '', title: 'Furniture Legs', price: 'LKR 980+' },
+}
+
+function HeroManager({ showToast }) {
+  const [hero, setHero] = useState(HERO_DEFAULTS)
+  const [loading, setLoading] = useState(true)
+  const [busySlot, setBusySlot] = useState(null)
+  const [saved, setSaved] = useState(false)
+
+  useEffect(() => {
+    fetch('/api/hero')
+      .then(r => r.json())
+      .then(({ hero }) => {
+        if (hero) setHero({ ...HERO_DEFAULTS, ...hero })
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
+  }, [])
+
+  const saveAll = async (next) => {
+    setHero(next)
+    try {
+      await fetch('/api/hero', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ hero: next }) })
+      setSaved(true); setTimeout(() => setSaved(false), 2000)
+    } catch { showToast('Save failed', 'error') }
+  }
+
+  const handleUpload = async (file, slot) => {
+    if (!file) return
+    setBusySlot(slot)
+    try {
+      const fd = new FormData()
+      fd.append('file', file, file.name)
+      const res = await fetch('/api/upload', { method: 'POST', body: fd })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Upload failed')
+      const next = { ...hero, [slot]: { ...hero[slot], img: data.url } }
+      await saveAll(next)
+      showToast('Photo updated')
+    } catch (e) {
+      showToast(e.message, 'error')
+    } finally {
+      setBusySlot(null)
+    }
+  }
+
+  const handleField = (slot, field, value) => {
+    setHero(h => ({ ...h, [slot]: { ...h[slot], [field]: value } }))
+  }
+
+  if (loading) return <p className="text-slate-500 text-sm py-8 text-center">Loading…</p>
+
+  return (
+    <div className="space-y-8">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <p className="text-white font-semibold">Hero Section Cards</p>
+          <p className="text-slate-500 text-xs mt-0.5">These 3 product cards appear in the hero on the home page</p>
+        </div>
+        <button
+          onClick={() => saveAll(hero)}
+          className="px-5 py-2 rounded-xl font-bold text-white bg-gradient-to-r from-sky-500 to-blue-600 glow-btn text-sm"
+        >
+          {saved ? '✓ Saved' : 'Save Changes'}
+        </button>
+      </div>
+
+      {/* visual layout preview label */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-2">
+          <HeroCardSpot
+            label="Large Card (top)"
+            aspectClass="h-52"
+            data={hero.main}
+            onUpload={f => handleUpload(f, 'main')}
+            onField={(field, val) => handleField('main', field, val)}
+            busy={busySlot === 'main'}
+          />
+        </div>
+        <div className="md:col-span-1 flex flex-col gap-4">
+          <HeroCardSpot
+            label="Small Card Left (bottom)"
+            aspectClass="h-36"
+            data={hero.card1}
+            onUpload={f => handleUpload(f, 'card1')}
+            onField={(field, val) => handleField('card1', field, val)}
+            busy={busySlot === 'card1'}
+          />
+          <HeroCardSpot
+            label="Small Card Right (bottom)"
+            aspectClass="h-36"
+            data={hero.card2}
+            onUpload={f => handleUpload(f, 'card2')}
+            onField={(field, val) => handleField('card2', field, val)}
+            busy={busySlot === 'card2'}
+          />
+        </div>
+      </div>
+
+      <p className="text-slate-600 text-xs text-center">Changes are saved automatically when you upload a photo. Click "Save Changes" after editing text fields.</p>
+    </div>
+  )
+}
+
 /* ── Main Admin Panel ── */
 function AdminPanel() {
   const { products, featuredIds, addProduct, updateProduct, deleteProduct, setFeatured } = useProducts()
@@ -758,6 +924,7 @@ function AdminPanel() {
             { id: 'form', label: editProduct ? `Edit: ${editProduct.name.slice(0, 20)}` : 'Add Product' },
             { id: 'featured', label: 'Featured' },
             { id: 'gallery', label: 'Collection Gallery' },
+            { id: 'hero', label: 'Hero Cards' },
           ].map(t => (
             <button key={t.id} onClick={() => { setTab(t.id); if (t.id !== 'form') setEditProduct(null) }}
               className={`px-5 py-3 text-sm font-semibold rounded-t-xl transition-colors relative -mb-px ${tab === t.id ? 'text-sky-400 border-b-2 border-sky-500 bg-sky-500/5' : 'text-slate-500 hover:text-slate-300'}`}>
@@ -831,6 +998,7 @@ function AdminPanel() {
 
           {tab === 'featured' && <FeaturedPicker products={products} featuredIds={featuredIds} onSave={handleSaveFeatured} />}
           {tab === 'gallery' && <GalleryManager showToast={showToast} />}
+          {tab === 'hero' && <HeroManager showToast={showToast} />}
         </div>
       </div>
 
