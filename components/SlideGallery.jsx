@@ -1,8 +1,8 @@
 'use client'
-import { useRef } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 
-const row1 = [
+const FALLBACK = [
   { label: 'Cabinet Handles',   img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=400&h=400&q=80' },
   { label: 'Soft-Close Hinges', img: 'https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=400&h=400&q=80' },
   { label: 'Drawer Slides',     img: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=400&h=400&q=80' },
@@ -11,9 +11,6 @@ const row1 = [
   { label: 'Furniture Legs',    img: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=400&h=400&q=80' },
   { label: 'Shelf Pins',        img: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=400&h=400&q=80' },
   { label: 'Bar Pulls',         img: 'https://images.unsplash.com/photo-1484154133-7e2c4e6d8f32?auto=format&fit=crop&w=400&h=400&q=80' },
-]
-
-const row2 = [
   { label: 'Push Latches',      img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&h=400&q=80' },
   { label: 'Hairpin Legs',      img: 'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=400&h=400&q=80' },
   { label: 'Cup Hinges',        img: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=400&h=400&q=80' },
@@ -43,6 +40,21 @@ export default function SlideGallery() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] })
   const x1 = useTransform(scrollYProgress, [0, 1], [0, -300])
   const x2 = useTransform(scrollYProgress, [0, 1], [-150, 150])
+  const [images, setImages] = useState(FALLBACK)
+
+  useEffect(() => {
+    fetch('/api/gallery')
+      .then(r => r.json())
+      .then(({ images }) => { if (images && images.length > 0) setImages(images) })
+      .catch(() => {})
+  }, [])
+
+  const mid = Math.ceil(images.length / 2)
+  const row1 = images.length >= 2 ? images.slice(0, mid) : images
+  const row2 = images.length >= 2 ? images.slice(mid) : images
+
+  const pad1 = row1.length < 4 ? [...row1, ...row1, ...row1, ...row1].slice(0, 8) : [...row1, ...row1]
+  const pad2 = row2.length < 4 ? [...row2, ...row2, ...row2, ...row2].slice(0, 8) : [...row2, ...row2]
 
   return (
     <section ref={ref} className="py-24 overflow-hidden relative" style={{ background: '#020810' }}>
@@ -54,13 +66,13 @@ export default function SlideGallery() {
       </div>
       <div className="slide-gallery-mask flex flex-col gap-5">
         <motion.div style={{ x: x1 }} className="flex gap-5 px-8">
-          {row1.map((item, i) => <GalleryCard key={i} {...item} />)}
-          {row1.map((item, i) => <GalleryCard key={`d1-${i}`} {...item} />)}
+          {pad1.map((item, i) => <GalleryCard key={i} {...item} />)}
         </motion.div>
-        <motion.div style={{ x: x2 }} className="flex gap-5 px-8">
-          {row2.map((item, i) => <GalleryCard key={i} {...item} />)}
-          {row2.map((item, i) => <GalleryCard key={`d2-${i}`} {...item} />)}
-        </motion.div>
+        {pad2.length > 0 && (
+          <motion.div style={{ x: x2 }} className="flex gap-5 px-8">
+            {pad2.map((item, i) => <GalleryCard key={i} {...item} />)}
+          </motion.div>
+        )}
       </div>
     </section>
   )

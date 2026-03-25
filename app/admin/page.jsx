@@ -534,6 +534,113 @@ function FeaturedPicker({ products, featuredIds, onSave }) {
   )
 }
 
+/* ── Gallery Manager ── */
+function GalleryManager({ showToast }) {
+  const [images, setImages] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [busy, setBusy] = useState(false)
+  const [label, setLabel] = useState('')
+  const inputRef = useRef(null)
+
+  useEffect(() => {
+    fetch('/api/gallery')
+      .then(r => r.json())
+      .then(({ images }) => { setImages(images || []); setLoading(false) })
+      .catch(() => setLoading(false))
+  }, [])
+
+  const save = async (next) => {
+    setImages(next)
+    try {
+      await fetch('/api/gallery', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ images: next }) })
+    } catch {}
+  }
+
+  const handleFile = async (file) => {
+    if (!file) return
+    setBusy(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file, file.name)
+      const res = await fetch('/api/upload', { method: 'POST', body: fd })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Upload failed')
+      const next = [...images, { label: label.trim() || file.name.replace(/\.[^.]+$/, ''), img: data.url }]
+      await save(next)
+      setLabel('')
+      showToast('Image added to collection')
+    } catch (e) {
+      showToast(e.message, 'error')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const remove = async (i) => {
+    const next = images.filter((_, idx) => idx !== i)
+    await save(next)
+    showToast('Image removed')
+  }
+
+  if (loading) return <p className="text-slate-500 text-sm">Loading gallery…</p>
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <p className="text-slate-400 text-sm">{images.length} image{images.length !== 1 ? 's' : ''} in collection gallery</p>
+        <p className="text-slate-600 text-xs">Images appear in the scrolling gallery on the home page</p>
+      </div>
+
+      <div className="glass border border-white/10 rounded-2xl p-5 space-y-3">
+        <h3 className="text-sm font-semibold text-white">Add Image</h3>
+        <div className="flex gap-3 flex-wrap">
+          <input
+            type="text"
+            placeholder="Label (e.g. Pantry Hinges)"
+            value={label}
+            onChange={e => setLabel(e.target.value)}
+            className="flex-1 min-w-[180px] px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-sky-500/60"
+          />
+          <button
+            type="button"
+            onClick={() => !busy && inputRef.current?.click()}
+            disabled={busy}
+            className="px-5 py-2 rounded-xl font-bold text-white bg-gradient-to-r from-sky-500 to-blue-600 glow-btn text-sm disabled:opacity-50 disabled:cursor-wait"
+          >
+            {busy ? 'Uploading…' : '+ Upload Photo'}
+          </button>
+          <input ref={inputRef} type="file" accept="image/*" className="hidden"
+            onChange={e => { handleFile(e.target.files[0]); e.target.value = '' }} />
+        </div>
+      </div>
+
+      {images.length === 0 ? (
+        <div className="text-center py-16 text-slate-600">
+          <div className="text-4xl mb-3">🖼️</div>
+          <p className="text-sm">No images yet — upload your first collection photo above</p>
+          <p className="text-xs mt-1">Until you add images, the gallery shows placeholder photos</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          {images.map((item, i) => (
+            <div key={i} className="relative group rounded-xl overflow-hidden border border-white/8 hover:border-sky-500/30 transition-colors aspect-square">
+              <img src={item.img} alt={item.label} className="w-full h-full object-cover brightness-75 group-hover:brightness-90 transition-all" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-2">
+                <p className="text-white text-xs font-semibold truncate">{item.label}</p>
+              </div>
+              <button
+                onClick={() => remove(i)}
+                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-red-500/80 text-white text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500 flex items-center justify-center"
+              >✕</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 /* ── Main Admin Panel ── */
 function AdminPanel() {
   const { products, featuredIds, addProduct, updateProduct, deleteProduct, setFeatured } = useProducts()
@@ -587,6 +694,7 @@ function AdminPanel() {
             { id: 'list', label: `Products (${products.length})` },
             { id: 'form', label: editProduct ? `Edit: ${editProduct.name.slice(0, 20)}` : 'Add Product' },
             { id: 'featured', label: 'Featured' },
+            { id: 'gallery', label: 'Collection Gallery' },
           ].map(t => (
             <button key={t.id} onClick={() => { setTab(t.id); if (t.id !== 'form') setEditProduct(null) }}
               className={`px-5 py-3 text-sm font-semibold rounded-t-xl transition-colors relative -mb-px ${tab === t.id ? 'text-sky-400 border-b-2 border-sky-500 bg-sky-500/5' : 'text-slate-500 hover:text-slate-300'}`}>
@@ -659,6 +767,7 @@ function AdminPanel() {
           )}
 
           {tab === 'featured' && <FeaturedPicker products={products} featuredIds={featuredIds} onSave={handleSaveFeatured} />}
+          {tab === 'gallery' && <GalleryManager showToast={showToast} />}
         </div>
       </div>
 
