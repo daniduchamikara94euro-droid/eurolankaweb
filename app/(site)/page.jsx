@@ -127,26 +127,85 @@ export default function Home() {
     <div style={{ background: '#020810' }}>
       <Hero />
 
-      <section className="py-28 px-6 relative">
+      <section className="py-28 px-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-grid opacity-40" />
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-sky-500/30 to-transparent" />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 80% 50% at 50% 50%, rgba(14,165,233,0.04) 0%, transparent 70%)' }} />
+
         <div className="max-w-6xl mx-auto relative">
           <ScrollReveal>
-            <div className="text-center mb-16">
+            <div className="text-center mb-20">
               <span className="tag mb-4 inline-block">Why Us</span>
               <h2 className="section-heading gradient-text">Why Choose Euro Lanka?</h2>
               <p className="section-sub">We bridge the gap between world-class Chinese manufacturing and Sri Lankan excellence.</p>
             </div>
           </ScrollReveal>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {features.map((f, i) => (
-              <ScrollReveal key={f.title} delay={i * 0.15}>
-                <div className="neon-card p-8 h-full group">
-                  <div className="text-5xl mb-5 animate-float" style={{ animationDelay: `${i * 0.5}s` }}>{f.icon}</div>
-                  <h3 className="text-xl font-bold text-white mb-3 group-hover:text-sky-400 transition-colors">{f.title}</h3>
-                  <p className="text-slate-500 leading-relaxed text-sm">{f.desc}</p>
-                  <div className="mt-6 h-px bg-gradient-to-r from-sky-500/40 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
-                </div>
+              <ScrollReveal key={f.title} delay={i * 0.2}>
+                <motion.div
+                  className="relative group h-full"
+                  whileHover={{ y: -8 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                >
+                  {/* animated gradient border */}
+                  <div className="absolute -inset-px rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    style={{ background: `linear-gradient(135deg, ${['rgba(14,165,233,0.6)','rgba(129,140,248,0.6)','rgba(168,85,247,0.6)'][i]}, transparent 60%)`, filter: 'blur(1px)' }} />
+
+                  <div className="relative h-full rounded-3xl p-8 flex flex-col overflow-hidden"
+                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', backdropFilter: 'blur(20px)' }}>
+
+                    {/* sweep light on hover */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
+                      style={{ background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.04) 50%, transparent 60%)', transform: 'translateX(-100%)', animation: 'none' }} />
+                    <motion.div
+                      className="absolute inset-0 pointer-events-none"
+                      initial={false}
+                      whileHover={{ backgroundPosition: ['200% 0', '-200% 0'] }}
+                      transition={{ duration: 1.2, ease: 'linear' }}
+                      style={{ background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.05) 50%, transparent 60%)', backgroundSize: '200% 100%' }}
+                    />
+
+                    {/* icon with glow ring */}
+                    <div className="relative mb-8 self-start">
+                      <div className="absolute inset-0 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                        style={{ background: ['rgba(14,165,233,0.4)','rgba(129,140,248,0.4)','rgba(168,85,247,0.4)'][i], transform: 'scale(1.5)' }} />
+                      <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center text-3xl"
+                        style={{ background: `linear-gradient(135deg, ${['rgba(14,165,233,0.15)','rgba(129,140,248,0.15)','rgba(168,85,247,0.15)'][i]}, rgba(255,255,255,0.03))`, border: `1px solid ${['rgba(14,165,233,0.3)','rgba(129,140,248,0.3)','rgba(168,85,247,0.3)'][i]}` }}>
+                        {f.icon}
+                      </div>
+                    </div>
+
+                    {/* number accent */}
+                    <div className="absolute top-6 right-6 text-7xl font-black select-none pointer-events-none leading-none"
+                      style={{ color: ['rgba(14,165,233,0.06)','rgba(129,140,248,0.06)','rgba(168,85,247,0.06)'][i] }}>
+                      0{i + 1}
+                    </div>
+
+                    <h3 className="text-xl font-bold text-white mb-3 transition-colors duration-300"
+                      style={{ '--hover-color': ['#0ea5e9','#818cf8','#a855f7'][i] }}
+                      onMouseEnter={e => e.currentTarget.style.color = ['#0ea5e9','#818cf8','#a855f7'][i]}
+                      onMouseLeave={e => e.currentTarget.style.color = 'white'}
+                    >{f.title}</h3>
+
+                    <p className="text-slate-500 leading-relaxed text-sm flex-1">{f.desc}</p>
+
+                    {/* bottom accent line */}
+                    <div className="mt-8 flex items-center gap-3">
+                      <div className="h-px flex-1 transition-all duration-700 origin-left"
+                        style={{ background: `linear-gradient(to right, ${['rgba(14,165,233,0.6)','rgba(129,140,248,0.6)','rgba(168,85,247,0.6)'][i]}, transparent)`,
+                          transform: 'scaleX(0.3)', opacity: 0.4 }} ref={el => {
+                          if (el) el.closest('.group') && el.closest('.group').addEventListener('mouseenter', () => { el.style.transform = 'scaleX(1)'; el.style.opacity = '1' }, { once: false })
+                          if (el) el.closest('.group') && el.closest('.group').addEventListener('mouseleave', () => { el.style.transform = 'scaleX(0.3)'; el.style.opacity = '0.4' }, { once: false })
+                        }} />
+                      <span className="text-xs font-semibold tracking-widest uppercase"
+                        style={{ color: ['rgba(14,165,233,0.5)','rgba(129,140,248,0.5)','rgba(168,85,247,0.5)'][i] }}>
+                        Learn more
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
               </ScrollReveal>
             ))}
           </div>
