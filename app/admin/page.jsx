@@ -535,12 +535,14 @@ function FeaturedPicker({ products, featuredIds, onSave }) {
 }
 
 /* ── Gallery Manager ── */
+const TOTAL_SLOTS = 16
+
 function GalleryManager({ showToast }) {
   const [images, setImages] = useState([])
   const [loading, setLoading] = useState(true)
-  const [busy, setBusy] = useState(false)
-  const [label, setLabel] = useState('')
-  const inputRef = useRef(null)
+  const [busySlot, setBusySlot] = useState(null)
+  const [editingLabel, setEditingLabel] = useState(null)
+  const fileRefs = useRef([])
 
   useEffect(() => {
     fetch('/api/gallery')
@@ -556,87 +558,148 @@ function GalleryManager({ showToast }) {
     } catch {}
   }
 
-  const handleFile = async (file) => {
+  const handleFile = async (file, slotIndex) => {
     if (!file) return
-    setBusy(true)
+    setBusySlot(slotIndex)
     try {
       const fd = new FormData()
       fd.append('file', file, file.name)
       const res = await fetch('/api/upload', { method: 'POST', body: fd })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Upload failed')
-      const next = [...images, { label: label.trim() || file.name.replace(/\.[^.]+$/, ''), img: data.url }]
+      const defaultLabel = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ')
+      const next = [...images]
+      if (slotIndex < images.length) {
+        next[slotIndex] = { ...next[slotIndex], img: data.url }
+      } else {
+        next.push({ label: defaultLabel, img: data.url })
+      }
       await save(next)
-      setLabel('')
-      showToast('Image added to collection')
+      showToast('Photo uploaded')
     } catch (e) {
       showToast(e.message, 'error')
     } finally {
-      setBusy(false)
+      setBusySlot(null)
     }
   }
 
   const remove = async (i) => {
     const next = images.filter((_, idx) => idx !== i)
     await save(next)
-    showToast('Image removed')
+    showToast('Photo removed')
   }
 
-  if (loading) return <p className="text-slate-500 text-sm">Loading gallery…</p>
+  const updateLabel = async (i, value) => {
+    const next = images.map((img, idx) => idx === i ? { ...img, label: value } : img)
+    await save(next)
+    setEditingLabel(null)
+  }
+
+  if (loading) return <p className="text-slate-500 text-sm py-8 text-center">Loading gallery…</p>
+
+  const slots = Array.from({ length: TOTAL_SLOTS }, (_, i) => images[i] || null)
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <p className="text-slate-400 text-sm">{images.length} image{images.length !== 1 ? 's' : ''} in collection gallery</p>
-        <p className="text-slate-600 text-xs">Images appear in the scrolling gallery on the home page</p>
-      </div>
-
-      <div className="glass border border-white/10 rounded-2xl p-5 space-y-3">
-        <h3 className="text-sm font-semibold text-white">Add Image</h3>
-        <div className="flex gap-3 flex-wrap">
-          <input
-            type="text"
-            placeholder="Label (e.g. Pantry Hinges)"
-            value={label}
-            onChange={e => setLabel(e.target.value)}
-            className="flex-1 min-w-[180px] px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-sky-500/60"
-          />
-          <button
-            type="button"
-            onClick={() => !busy && inputRef.current?.click()}
-            disabled={busy}
-            className="px-5 py-2 rounded-xl font-bold text-white bg-gradient-to-r from-sky-500 to-blue-600 glow-btn text-sm disabled:opacity-50 disabled:cursor-wait"
-          >
-            {busy ? 'Uploading…' : '+ Upload Photo'}
-          </button>
-          <input ref={inputRef} type="file" accept="image/*" className="hidden"
-            onChange={e => { handleFile(e.target.files[0]); e.target.value = '' }} />
+    <div className="space-y-5">
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <p className="text-white font-semibold">{images.length} / {TOTAL_SLOTS} photos uploaded</p>
+          <p className="text-slate-500 text-xs mt-0.5">Click any empty slot to upload · Click a photo to replace it</p>
         </div>
-      </div>
-
-      {images.length === 0 ? (
-        <div className="text-center py-16 text-slate-600">
-          <div className="text-4xl mb-3">🖼️</div>
-          <p className="text-sm">No images yet — upload your first collection photo above</p>
-          <p className="text-xs mt-1">Until you add images, the gallery shows placeholder photos</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {images.map((item, i) => (
-            <div key={i} className="relative group rounded-xl overflow-hidden border border-white/8 hover:border-sky-500/30 transition-colors aspect-square">
-              <img src={item.img} alt={item.label} className="w-full h-full object-cover brightness-75 group-hover:brightness-90 transition-all" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-2">
-                <p className="text-white text-xs font-semibold truncate">{item.label}</p>
-              </div>
-              <button
-                onClick={() => remove(i)}
-                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-red-500/80 text-white text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500 flex items-center justify-center"
-              >✕</button>
-            </div>
+        <div className="flex gap-1.5">
+          {Array.from({ length: TOTAL_SLOTS }, (_, i) => (
+            <div key={i} className={`w-2.5 h-2.5 rounded-full transition-colors ${i < images.length ? 'bg-sky-400' : 'bg-white/10'}`} />
           ))}
         </div>
-      )}
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        {slots.map((item, i) => (
+          <div key={i} className="aspect-square relative">
+            {item ? (
+              /* filled slot */
+              <div className="w-full h-full rounded-2xl overflow-hidden relative group border border-white/10 hover:border-sky-500/40 transition-colors shadow-xl shadow-black/40">
+                <img src={item.img} alt={item.label} className="w-full h-full object-cover brightness-75 group-hover:brightness-95 transition-all duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+
+                {/* label — click to edit */}
+                <div className="absolute bottom-0 left-0 right-0 p-3">
+                  {editingLabel === i ? (
+                    <input
+                      autoFocus
+                      defaultValue={item.label}
+                      className="w-full bg-black/60 border border-sky-500/60 rounded-lg px-2 py-1 text-white text-xs focus:outline-none"
+                      onBlur={e => updateLabel(i, e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter') updateLabel(i, e.target.value) }}
+                    />
+                  ) : (
+                    <button
+                      onClick={() => setEditingLabel(i)}
+                      className="text-left w-full text-white text-xs font-semibold truncate hover:text-sky-300 transition-colors"
+                      title="Click to edit label"
+                    >
+                      ✏️ {item.label || 'Add label'}
+                    </button>
+                  )}
+                </div>
+
+                {/* action buttons */}
+                <div className="absolute top-2 right-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={() => fileRefs.current[i]?.click()}
+                    className="w-7 h-7 rounded-full bg-sky-500/80 hover:bg-sky-500 text-white text-xs flex items-center justify-center"
+                    title="Replace photo"
+                  >↑</button>
+                  <button
+                    onClick={() => remove(i)}
+                    className="w-7 h-7 rounded-full bg-red-500/80 hover:bg-red-500 text-white text-xs flex items-center justify-center"
+                    title="Remove photo"
+                  >✕</button>
+                </div>
+
+                {/* slot number badge */}
+                <div className="absolute top-2 left-2 w-6 h-6 rounded-full bg-black/60 text-slate-400 text-xs flex items-center justify-center font-bold">
+                  {i + 1}
+                </div>
+
+                {busySlot === i && (
+                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center rounded-2xl">
+                    <div className="w-6 h-6 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* empty slot */
+              <button
+                type="button"
+                onClick={() => fileRefs.current[i]?.click()}
+                disabled={busySlot !== null}
+                className="w-full h-full rounded-2xl border-2 border-dashed border-white/15 hover:border-sky-500/50 hover:bg-sky-500/5 transition-all duration-200 flex flex-col items-center justify-center gap-2 group disabled:opacity-40"
+              >
+                {busySlot === i ? (
+                  <div className="w-6 h-6 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <div className="w-10 h-10 rounded-full bg-white/5 group-hover:bg-sky-500/15 border border-white/10 group-hover:border-sky-500/30 flex items-center justify-center text-xl transition-all duration-200">
+                      📷
+                    </div>
+                    <span className="text-slate-600 group-hover:text-sky-400 text-xs font-medium transition-colors">Slot {i + 1}</span>
+                    <span className="text-slate-700 text-[10px]">Click to upload</span>
+                  </>
+                )}
+              </button>
+            )}
+
+            <input
+              ref={el => fileRefs.current[i] = el}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={e => { handleFile(e.target.files[0], i); e.target.value = '' }}
+            />
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
