@@ -704,168 +704,201 @@ function GalleryManager({ showToast }) {
   )
 }
 
-/* ── Hero Cards Manager ── */
-function HeroCardSpot({ label, aspectClass, data, onUpload, onField, busy }) {
-  const inputRef = useRef(null)
-  return (
-    <div className="space-y-3">
-      <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{label}</p>
-
-      {/* image spot */}
-      <div
-        className={`relative rounded-2xl overflow-hidden border-2 cursor-pointer group transition-all duration-200 ${data.img ? 'border-white/10 hover:border-sky-500/40' : 'border-dashed border-white/15 hover:border-sky-500/50 hover:bg-sky-500/5'} ${aspectClass}`}
-        onClick={() => !busy && inputRef.current?.click()}
-      >
-        {data.img ? (
-          <>
-            <img src={data.img} alt={data.title} className="w-full h-full object-cover brightness-75 group-hover:brightness-90 transition-all duration-300" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <div className="bg-black/60 px-4 py-2 rounded-xl text-white text-sm font-semibold">📷 Replace</div>
-            </div>
-          </>
-        ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-            {busy ? (
-              <div className="w-8 h-8 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <>
-                <div className="w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-2xl">📷</div>
-                <span className="text-slate-500 text-sm font-medium">Click to upload</span>
-              </>
-            )}
-          </div>
-        )}
-        {busy && data.img && (
-          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-            <div className="w-8 h-8 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
-          </div>
-        )}
-        <input ref={inputRef} type="file" accept="image/*" className="hidden"
-          onChange={e => { onUpload(e.target.files[0]); e.target.value = '' }} />
-      </div>
-
-      {/* editable fields */}
-      <div className="space-y-2">
-        <input type="text" value={data.title || ''} onChange={e => onField('title', e.target.value)}
-          placeholder="Title (e.g. Premium Cabinet Handles)"
-          className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-sky-500/60 placeholder-slate-600" />
-        {'subtitle' in data && (
-          <input type="text" value={data.subtitle || ''} onChange={e => onField('subtitle', e.target.value)}
-            placeholder="Subtitle (e.g. Stainless Steel · Brushed Finish)"
-            className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-sky-500/60 placeholder-slate-600" />
-        )}
-        <input type="text" value={data.price || ''} onChange={e => onField('price', e.target.value)}
-          placeholder="Price (e.g. LKR 450+)"
-          className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-sky-500/60 placeholder-slate-600" />
-      </div>
-    </div>
-  )
-}
-
-const HERO_DEFAULTS = {
-  main:  { img: '', title: 'Premium Cabinet Handles', subtitle: 'Stainless Steel · Brushed Finish', price: 'LKR 450+' },
-  card1: { img: '', title: 'Soft-Close Hinges', price: 'LKR 280+' },
-  card2: { img: '', title: 'Furniture Legs', price: 'LKR 980+' },
-}
+/* ── Hero Slider Manager ── */
+const BLANK_SLIDE = { img: '', title: '', subtitle: '', price: '', badge: '' }
 
 function HeroManager({ showToast }) {
-  const [hero, setHero] = useState(HERO_DEFAULTS)
+  const [slides, setSlides] = useState([])
   const [loading, setLoading] = useState(true)
-  const [busySlot, setBusySlot] = useState(null)
+  const [busyIdx, setBusyIdx] = useState(null)
   const [saved, setSaved] = useState(false)
+  const [active, setActive] = useState(0)
+  const fileRefs = useRef([])
 
   useEffect(() => {
     fetch('/api/hero')
       .then(r => r.json())
       .then(({ hero }) => {
-        if (hero) setHero({ ...HERO_DEFAULTS, ...hero })
+        setSlides(hero?.slides?.length ? hero.slides : [{ ...BLANK_SLIDE }])
         setLoading(false)
       })
       .catch(() => setLoading(false))
   }, [])
 
-  const saveAll = async (next) => {
-    setHero(next)
+  const persist = async (next) => {
+    setSlides(next)
     try {
-      await fetch('/api/hero', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ hero: next }) })
+      await fetch('/api/hero', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ hero: { slides: next } }) })
       setSaved(true); setTimeout(() => setSaved(false), 2000)
     } catch { showToast('Save failed', 'error') }
   }
 
-  const handleUpload = async (file, slot) => {
+  const uploadImg = async (file, idx) => {
     if (!file) return
-    setBusySlot(slot)
+    setBusyIdx(idx)
     try {
-      const fd = new FormData()
-      fd.append('file', file, file.name)
+      const fd = new FormData(); fd.append('file', file, file.name)
       const res = await fetch('/api/upload', { method: 'POST', body: fd })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Upload failed')
-      const next = { ...hero, [slot]: { ...hero[slot], img: data.url } }
-      await saveAll(next)
-      showToast('Photo updated')
-    } catch (e) {
-      showToast(e.message, 'error')
-    } finally {
-      setBusySlot(null)
-    }
+      const next = slides.map((s, i) => i === idx ? { ...s, img: data.url } : s)
+      await persist(next)
+      showToast('Photo uploaded')
+    } catch (e) { showToast(e.message, 'error') }
+    finally { setBusyIdx(null) }
   }
 
-  const handleField = (slot, field, value) => {
-    setHero(h => ({ ...h, [slot]: { ...h[slot], [field]: value } }))
+  const setField = (idx, field, val) => setSlides(s => s.map((sl, i) => i === idx ? { ...sl, [field]: val } : sl))
+
+  const addSlide = () => {
+    if (slides.length >= 8) return showToast('Maximum 8 slides', 'error')
+    const next = [...slides, { ...BLANK_SLIDE }]
+    setSlides(next); setActive(next.length - 1)
+  }
+
+  const removeSlide = async (idx) => {
+    if (slides.length <= 1) return showToast('Need at least 1 slide', 'error')
+    const next = slides.filter((_, i) => i !== idx)
+    setActive(Math.min(active, next.length - 1))
+    await persist(next)
+    showToast('Slide removed')
+  }
+
+  const moveSlide = async (idx, dir) => {
+    const next = [...slides]
+    const swap = idx + dir
+    if (swap < 0 || swap >= next.length) return
+    ;[next[idx], next[swap]] = [next[swap], next[idx]]
+    setActive(swap)
+    await persist(next)
   }
 
   if (loading) return <p className="text-slate-500 text-sm py-8 text-center">Loading…</p>
 
+  const slide = slides[active] || BLANK_SLIDE
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
+      {/* header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <p className="text-white font-semibold">Hero Section Cards</p>
-          <p className="text-slate-500 text-xs mt-0.5">These 3 product cards appear in the hero on the home page</p>
+          <p className="text-white font-semibold">Hero Slider — {slides.length} slide{slides.length !== 1 ? 's' : ''}</p>
+          <p className="text-slate-500 text-xs mt-0.5">Auto-plays every 4 seconds on the home page</p>
         </div>
-        <button
-          onClick={() => saveAll(hero)}
-          className="px-5 py-2 rounded-xl font-bold text-white bg-gradient-to-r from-sky-500 to-blue-600 glow-btn text-sm"
-        >
-          {saved ? '✓ Saved' : 'Save Changes'}
-        </button>
-      </div>
-
-      {/* visual layout preview label */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2">
-          <HeroCardSpot
-            label="Large Card (top)"
-            aspectClass="h-52"
-            data={hero.main}
-            onUpload={f => handleUpload(f, 'main')}
-            onField={(field, val) => handleField('main', field, val)}
-            busy={busySlot === 'main'}
-          />
-        </div>
-        <div className="md:col-span-1 flex flex-col gap-4">
-          <HeroCardSpot
-            label="Small Card Left (bottom)"
-            aspectClass="h-36"
-            data={hero.card1}
-            onUpload={f => handleUpload(f, 'card1')}
-            onField={(field, val) => handleField('card1', field, val)}
-            busy={busySlot === 'card1'}
-          />
-          <HeroCardSpot
-            label="Small Card Right (bottom)"
-            aspectClass="h-36"
-            data={hero.card2}
-            onUpload={f => handleUpload(f, 'card2')}
-            onField={(field, val) => handleField('card2', field, val)}
-            busy={busySlot === 'card2'}
-          />
+        <div className="flex gap-2">
+          <button onClick={addSlide}
+            className="px-4 py-2 rounded-xl font-bold text-sky-400 border border-sky-500/30 hover:bg-sky-500/10 text-sm transition-colors">
+            + Add Slide
+          </button>
+          <button onClick={() => persist(slides)}
+            className="px-5 py-2 rounded-xl font-bold text-white bg-gradient-to-r from-sky-500 to-blue-600 glow-btn text-sm">
+            {saved ? '✓ Saved' : 'Save All'}
+          </button>
         </div>
       </div>
 
-      <p className="text-slate-600 text-xs text-center">Changes are saved automatically when you upload a photo. Click "Save Changes" after editing text fields.</p>
+      {/* slide tabs */}
+      <div className="flex gap-2 flex-wrap">
+        {slides.map((s, i) => (
+          <button key={i} onClick={() => setActive(i)}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${active === i ? 'bg-sky-500/20 border-sky-500/50 text-sky-400' : 'border-white/10 text-slate-500 hover:text-slate-300'}`}>
+            {s.img
+              ? <img src={s.img} className="w-5 h-5 rounded object-cover" alt="" />
+              : <span className="w-5 h-5 rounded border border-dashed border-white/20 flex items-center justify-center text-[10px]">?</span>
+            }
+            Slide {i + 1}
+            {i > 0 && <span className="opacity-40 hover:opacity-100 transition-opacity" onClick={e => { e.stopPropagation(); moveSlide(i, -1) }}>←</span>}
+            {i < slides.length - 1 && <span className="opacity-40 hover:opacity-100 transition-opacity" onClick={e => { e.stopPropagation(); moveSlide(i, 1) }}>→</span>}
+            <span className="text-red-400/50 hover:text-red-400 transition-colors" onClick={e => { e.stopPropagation(); removeSlide(i) }}>✕</span>
+          </button>
+        ))}
+      </div>
+
+      {/* editor */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 rounded-2xl border border-white/8 p-6"
+        style={{ background: 'rgba(255,255,255,0.02)' }}>
+
+        {/* image upload spot */}
+        <div className="space-y-3">
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Slide {active + 1} — Image</p>
+          <div
+            className={`relative h-64 rounded-2xl overflow-hidden border-2 cursor-pointer group transition-all duration-200 ${slide.img ? 'border-white/10 hover:border-sky-500/40' : 'border-dashed border-white/15 hover:border-sky-500/50 hover:bg-sky-500/5'}`}
+            onClick={() => busyIdx === null && fileRefs.current[active]?.click()}
+          >
+            {slide.img ? (
+              <>
+                <img src={slide.img} alt="" className="w-full h-full object-cover brightness-75 group-hover:brightness-90 transition-all duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                {/* preview overlay */}
+                <div className="absolute bottom-3 left-3 right-3">
+                  <div className="flex items-center justify-between mb-1">
+                    {slide.badge && <span className="px-2 py-0.5 rounded-full text-[10px] font-bold text-sky-300" style={{ background: 'rgba(14,165,233,0.2)', border: '1px solid rgba(14,165,233,0.3)' }}>{slide.badge}</span>}
+                    {slide.price && <span className="text-[10px] font-black text-amber-400">{slide.price}</span>}
+                  </div>
+                  {slide.title && <p className="text-white text-sm font-bold truncate">{slide.title}</p>}
+                  {slide.subtitle && <p className="text-slate-400 text-[11px] truncate">{slide.subtitle}</p>}
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="bg-black/60 px-4 py-2 rounded-xl text-white text-sm font-semibold backdrop-blur-sm">📷 Replace Image</span>
+                </div>
+              </>
+            ) : (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                {busyIdx === active
+                  ? <div className="w-10 h-10 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
+                  : <>
+                      <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-3xl">🖼️</div>
+                      <p className="text-slate-500 text-sm font-medium">Click to upload photo</p>
+                      <p className="text-slate-700 text-xs">JPG, PNG, WebP · Max 10MB</p>
+                    </>
+                }
+              </div>
+            )}
+            {busyIdx === active && slide.img && (
+              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                <div className="w-10 h-10 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
+              </div>
+            )}
+            <input ref={el => fileRefs.current[active] = el} type="file" accept="image/*" className="hidden"
+              onChange={e => { uploadImg(e.target.files[0], active); e.target.value = '' }} />
+          </div>
+        </div>
+
+        {/* text fields */}
+        <div className="space-y-4">
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Slide {active + 1} — Details</p>
+          <div className="space-y-3">
+            {[
+              { field: 'title',    placeholder: 'Product title  (e.g. Premium Cabinet Handles)', label: 'Title' },
+              { field: 'subtitle', placeholder: 'Subtitle  (e.g. Stainless Steel · Brushed Finish)', label: 'Subtitle' },
+              { field: 'price',    placeholder: 'Price  (e.g. LKR 450+)', label: 'Price' },
+              { field: 'badge',    placeholder: 'Category badge  (e.g. Handles)', label: 'Badge' },
+            ].map(({ field, placeholder, label }) => (
+              <div key={field}>
+                <label className="block text-[10px] text-slate-600 uppercase tracking-wider mb-1">{label}</label>
+                <input
+                  type="text"
+                  value={slide[field] || ''}
+                  onChange={e => setField(active, field, e.target.value)}
+                  placeholder={placeholder}
+                  className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-sky-500/60 placeholder-slate-700"
+                />
+              </div>
+            ))}
+          </div>
+          <div className="pt-2 p-4 rounded-xl border border-white/6 space-y-1" style={{ background: 'rgba(14,165,233,0.04)' }}>
+            <p className="text-slate-600 text-xs font-semibold">Preview</p>
+            <p className="text-white text-sm font-bold">{slide.title || '—'}</p>
+            <p className="text-slate-500 text-xs">{slide.subtitle || '—'}</p>
+            <div className="flex gap-2 mt-1">
+              {slide.badge && <span className="text-sky-400 text-xs">[{slide.badge}]</span>}
+              {slide.price && <span className="text-amber-400 text-xs font-bold">{slide.price}</span>}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p className="text-slate-700 text-xs text-center">Images save automatically on upload · Click "Save All" after editing text</p>
     </div>
   )
 }
