@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
+// Link kept for CTA buttons below
 
 const DEFAULT_SLIDES = [
   { img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=600&h=900&q=85', title: 'PREMIUM CABINET HANDLES', subtitle: 'Stainless Steel · Brushed Finish', badge: '#Handles', price: 'LKR 450+' },
@@ -97,39 +98,9 @@ export default function HeroVisual() {
       <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 75% 55% at 50% 45%, rgba(14,165,233,0.06) 0%, transparent 70%)' }} />
       <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(7,9,15,0.55) 0%, transparent 25%, transparent 55%, rgba(7,9,15,0.92) 100%)' }} />
 
-      {/* ── Top bar ── */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 pt-7 flex items-center justify-between">
-        <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-          <Link href="/" className="group flex flex-col">
-            <span className="text-white font-black text-lg tracking-[0.14em] uppercase group-hover:text-sky-400 transition-colors">Euro Lanka</span>
-            <span className="text-[9px] tracking-[0.35em] uppercase" style={{ color: 'rgba(14,165,233,0.5)' }}>Imported Design Excellence</span>
-          </Link>
-        </motion.div>
-
-        {/* animated glass badge */}
-        <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
-          className="hidden sm:block">
-          <div className="relative inline-flex items-center gap-3 px-5 py-2.5 rounded-full overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, rgba(14,165,233,0.12), rgba(129,140,248,0.08))', border: '1px solid rgba(14,165,233,0.22)', backdropFilter: 'blur(20px)', boxShadow: '0 0 20px rgba(14,165,233,0.12), inset 0 1px 0 rgba(255,255,255,0.08)' }}>
-            <motion.div className="absolute inset-0 pointer-events-none rounded-full"
-              animate={{ x: ['-120%', '220%'] }}
-              transition={{ duration: 2.8, repeat: Infinity, repeatDelay: 3.5, ease: 'easeInOut' }}
-              style={{ background: 'linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.16) 50%, transparent 70%)', width: '60%' }} />
-            <div className="absolute top-0 left-6 right-6 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent)' }} />
-            <span className="text-xs font-semibold" style={{ background: 'linear-gradient(90deg,#7dd3fc,#e0e7ff,#7dd3fc)', backgroundSize: '200% auto', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', animation: 'gradientShift 4s linear infinite' }}>Direct China Imports</span>
-            <span className="w-px h-3 rounded-full" style={{ background: 'rgba(148,163,184,0.25)' }} />
-            <span className="text-xs font-semibold" style={{ background: 'linear-gradient(90deg,#fbbf24,#f9a8d4,#fbbf24)', backgroundSize: '200% auto', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', animation: 'gradientShift 3s linear infinite' }}>Premium Quality</span>
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-60" />
-              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-400" />
-            </span>
-          </div>
-        </motion.div>
-      </div>
-
       {/* ── Headline ── */}
       <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.7 }}
-        className="relative z-10 text-center mt-7 mb-8 px-4">
+        className="relative z-10 text-center mt-24 mb-8 px-4">
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight tracking-wide">
           Elevate Your <span className="gradient-text">Furniture</span> Design
         </h1>
