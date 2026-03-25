@@ -92,8 +92,6 @@ function Hero() {
               <div className="absolute top-0 left-6 right-6 h-px rounded-full"
                 style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)' }} />
 
-              <span className="text-base">🇨🇳</span>
-
               <span className="text-sm font-semibold tracking-wide"
                 style={{ background: 'linear-gradient(90deg, #7dd3fc, #e0e7ff, #7dd3fc)', backgroundSize: '200% auto', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', animation: 'gradientShift 4s linear infinite' }}>
                 Direct China Imports
