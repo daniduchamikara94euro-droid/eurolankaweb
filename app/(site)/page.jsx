@@ -66,10 +66,52 @@ function Hero() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-center min-h-screen py-24">
         <div className="flex flex-col gap-6">
-          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 self-start px-4 py-2 rounded-full glass border border-sky-500/25 text-sky-400 text-sm font-medium">
-            🇨🇳 <span>Direct China Imports · Premium Quality</span>
-            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="self-start"
+          >
+            <div className="relative inline-flex items-center gap-3 px-5 py-2.5 rounded-full overflow-hidden"
+              style={{
+                background: 'linear-gradient(135deg, rgba(14,165,233,0.12), rgba(129,140,248,0.08), rgba(14,165,233,0.06))',
+                border: '1px solid rgba(14,165,233,0.25)',
+                boxShadow: '0 0 24px rgba(14,165,233,0.15), inset 0 1px 0 rgba(255,255,255,0.1)',
+                backdropFilter: 'blur(20px)',
+              }}>
+
+              {/* glare sweep */}
+              <motion.div
+                className="absolute inset-0 pointer-events-none rounded-full"
+                animate={{ x: ['-120%', '220%'] }}
+                transition={{ duration: 2.8, repeat: Infinity, repeatDelay: 3, ease: 'easeInOut' }}
+                style={{ background: 'linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.18) 50%, transparent 70%)', width: '60%', top: 0, bottom: 0 }}
+              />
+
+              {/* top gloss line */}
+              <div className="absolute top-0 left-6 right-6 h-px rounded-full"
+                style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)' }} />
+
+              <span className="text-base">🇨🇳</span>
+
+              <span className="text-sm font-semibold tracking-wide"
+                style={{ background: 'linear-gradient(90deg, #7dd3fc, #e0e7ff, #7dd3fc)', backgroundSize: '200% auto', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', animation: 'gradientShift 4s linear infinite' }}>
+                Direct China Imports
+              </span>
+
+              <span className="w-px h-3 rounded-full" style={{ background: 'rgba(148,163,184,0.3)' }} />
+
+              <span className="text-sm font-semibold"
+                style={{ background: 'linear-gradient(90deg, #fbbf24, #f9a8d4, #fbbf24)', backgroundSize: '200% auto', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', animation: 'gradientShift 3s linear infinite' }}>
+                Premium Quality
+              </span>
+
+              {/* live dot */}
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-60" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
+              </span>
+            </div>
           </motion.div>
 
           <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }}
