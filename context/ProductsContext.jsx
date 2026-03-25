@@ -192,37 +192,106 @@ const SEED_FEATURED = [1, 3, 5, 7]
 
 const ProductsContext = createContext(null)
 
+async function syncToKV(products, featured) {
+  try {
+    await fetch('/api/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ products, featured }),
+    })
+  } catch {}
+}
+
 export function ProductsProvider({ children }) {
-  // Always start with seed data (server + client match = no hydration mismatch)
-  const [products, setProducts] = useState(SEED_PRODUCTS)
+  const [products, setProducts]     = useState(SEED_PRODUCTS)
   const [featuredIds, setFeaturedIds] = useState(SEED_FEATURED)
 
-  // Load from localStorage after hydration
+  // On mount: load from KV (shared across devices), fall back to localStorage
   useEffect(() => {
-    try {
-      const storedProducts = localStorage.getItem('elw_products')
-      if (storedProducts) setProducts(JSON.parse(storedProducts))
-      const storedFeatured = localStorage.getItem('elw_featured')
-      if (storedFeatured) setFeaturedIds(JSON.parse(storedFeatured))
-    } catch {}
+    async function load() {
+      try {
+        const res  = await fetch('/api/products')
+        const data = await res.json()
+        if (data.products) {
+          setProducts(data.products)
+          try { localStorage.setItem('elw_products', JSON.stringify(data.products)) } catch {}
+        } else {
+          // KV not configured — fall back to localStorage
+          try {
+            const local = localStorage.getItem('elw_products')
+            if (local) setProducts(JSON.parse(local))
+          } catch {}
+        }
+        if (data.featured) {
+          setFeaturedIds(data.featured)
+          try { localStorage.setItem('elw_featured', JSON.stringify(data.featured)) } catch {}
+        } else {
+          try {
+            const local = localStorage.getItem('elw_featured')
+            if (local) setFeaturedIds(JSON.parse(local))
+          } catch {}
+        }
+      } catch {
+        // Network error — use localStorage
+        try {
+          const lp = localStorage.getItem('elw_products')
+          const lf = localStorage.getItem('elw_featured')
+          if (lp) setProducts(JSON.parse(lp))
+          if (lf) setFeaturedIds(JSON.parse(lf))
+        } catch {}
+      }
+    }
+    load()
   }, [])
 
-  useEffect(() => {
-    localStorage.setItem('elw_products', JSON.stringify(products))
-  }, [products])
-
-  useEffect(() => {
-    localStorage.setItem('elw_featured', JSON.stringify(featuredIds))
-  }, [featuredIds])
-
   const generateId = () => products.length === 0 ? 1 : Math.max(...products.map(p => p.id)) + 1
-  const addProduct = (product) => { const newProduct = { ...product, id: generateId() }; setProducts(prev => [...prev, newProduct]); return newProduct }
-  const updateProduct = (id, updates) => setProducts(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p))
-  const deleteProduct = (id) => { setProducts(prev => prev.filter(p => p.id !== id)); setFeaturedIds(prev => prev.filter(fid => fid !== id)) }
+
+  const addProduct = (product) => {
+    const newProduct = { ...product, id: generateId() }
+    setProducts(prev => {
+      const next = [...prev, newProduct]
+      syncToKV(next, featuredIds)
+      try { localStorage.setItem('elw_products', JSON.stringify(next)) } catch {}
+      return next
+    })
+    return newProduct
+  }
+
+  const updateProduct = (id, updates) => {
+    setProducts(prev => {
+      const next = prev.map(p => p.id === id ? { ...p, ...updates } : p)
+      syncToKV(next, featuredIds)
+      try { localStorage.setItem('elw_products', JSON.stringify(next)) } catch {}
+      return next
+    })
+  }
+
+  const deleteProduct = (id) => {
+    setProducts(prev => {
+      const next = prev.filter(p => p.id !== id)
+      setFeaturedIds(fids => {
+        const nextF = fids.filter(fid => fid !== id)
+        syncToKV(next, nextF)
+        try { localStorage.setItem('elw_featured', JSON.stringify(nextF)) } catch {}
+        return nextF
+      })
+      try { localStorage.setItem('elw_products', JSON.stringify(next)) } catch {}
+      return next
+    })
+  }
+
   const setFeatured = (id, featured) => {
     setFeaturedIds(prev => {
-      if (featured) { if (prev.includes(id)) return prev; if (prev.length >= 4) return prev; return [...prev, id] }
-      else { return prev.filter(fid => fid !== id) }
+      let next
+      if (featured) {
+        if (prev.includes(id) || prev.length >= 4) return prev
+        next = [...prev, id]
+      } else {
+        next = prev.filter(fid => fid !== id)
+      }
+      syncToKV(products, next)
+      try { localStorage.setItem('elw_featured', JSON.stringify(next)) } catch {}
+      return next
     })
   }
 
