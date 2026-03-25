@@ -47,13 +47,17 @@ export default function HeroVisual() {
   useEffect(() => {
     fetch('/api/hero')
       .then(r => r.json())
-      .then(({ hero }) => { if (hero) setHero({ ...DEFAULTS, ...hero }) })
+      .then(({ hero }) => { if (hero) setHero(hero) })
       .catch(() => {})
   }, [])
 
-  const main  = { ...DEFAULTS.main,  ...hero?.main  }
-  const card1 = { ...DEFAULTS.card1, ...hero?.card1 }
-  const card2 = { ...DEFAULTS.card2, ...hero?.card2 }
+  const merge = (def, over) => {
+    if (!over) return def
+    return { ...def, ...Object.fromEntries(Object.entries(over).filter(([, v]) => v !== '' && v != null)) }
+  }
+  const main  = merge(DEFAULTS.main,  hero?.main)
+  const card1 = merge(DEFAULTS.card1, hero?.card1)
+  const card2 = merge(DEFAULTS.card2, hero?.card2)
 
   return (
     <div className="relative w-full h-full select-none" style={{ perspective: '1000px' }}>
