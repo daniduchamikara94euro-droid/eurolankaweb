@@ -7,7 +7,6 @@ import GlassCard from '@/components/GlassCard'
 import ProductCard from '@/components/ProductCard'
 import ProductModal from '@/components/ProductModal'
 import SlideGallery from '@/components/SlideGallery'
-import HeroVisual from '@/components/HeroVisual'
 import { useProducts } from '@/context/ProductsContext'
 
 const features = [
@@ -55,11 +54,13 @@ function StatItem({ label, value, suffix }) {
   )
 }
 
-function Hero() {
-  return <HeroVisual />
-}
+const HERO_IMGS = [
+  'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=600&h=900&q=85',
+  'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=600&h=900&q=80',
+  'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=600&h=900&q=80',
+]
 
-function _OldHero() {
+function Hero() {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden" style={{ background: '#020810' }}>
       <div className="absolute inset-0 bg-grid" />
@@ -83,32 +84,23 @@ function _OldHero() {
                 boxShadow: '0 0 24px rgba(14,165,233,0.15), inset 0 1px 0 rgba(255,255,255,0.1)',
                 backdropFilter: 'blur(20px)',
               }}>
-
-              {/* glare sweep */}
               <motion.div
                 className="absolute inset-0 pointer-events-none rounded-full"
                 animate={{ x: ['-120%', '220%'] }}
                 transition={{ duration: 2.8, repeat: Infinity, repeatDelay: 3, ease: 'easeInOut' }}
                 style={{ background: 'linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.18) 50%, transparent 70%)', width: '60%', top: 0, bottom: 0 }}
               />
-
-              {/* top gloss line */}
               <div className="absolute top-0 left-6 right-6 h-px rounded-full"
                 style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)' }} />
-
               <span className="text-sm font-semibold tracking-wide"
                 style={{ background: 'linear-gradient(90deg, #7dd3fc, #e0e7ff, #7dd3fc)', backgroundSize: '200% auto', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', animation: 'gradientShift 4s linear infinite' }}>
                 Direct China Imports
               </span>
-
               <span className="w-px h-3 rounded-full" style={{ background: 'rgba(148,163,184,0.3)' }} />
-
               <span className="text-sm font-semibold"
                 style={{ background: 'linear-gradient(90deg, #fbbf24, #f9a8d4, #fbbf24)', backgroundSize: '200% auto', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', animation: 'gradientShift 3s linear infinite' }}>
                 Premium Quality
               </span>
-
-              {/* live dot */}
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-60" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
@@ -147,9 +139,30 @@ function _OldHero() {
           </motion.div>
         </div>
 
+        {/* right: floating image stack */}
         <motion.div initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.9, delay: 0.3 }}
-          className="relative h-[460px] lg:h-[580px]">
-          <HeroVisual />
+          className="relative h-[460px] lg:h-[580px] hidden lg:block">
+          <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute rounded-2xl overflow-hidden shadow-2xl"
+            style={{ width: 220, height: 300, top: '5%', left: '10%', rotate: '-6deg', boxShadow: '0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.07)' }}>
+            <img src={HERO_IMGS[0]} alt="" className="w-full h-full object-cover" style={{ filter: 'brightness(0.85)' }} />
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%)' }} />
+          </motion.div>
+          <motion.div animate={{ y: [0, 10, 0] }} transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+            className="absolute rounded-2xl overflow-hidden shadow-2xl"
+            style={{ width: 240, height: 340, top: '15%', left: '32%', boxShadow: '0 24px 70px rgba(14,165,233,0.18), 0 0 0 1px rgba(14,165,233,0.2)' }}>
+            <img src={HERO_IMGS[1]} alt="" className="w-full h-full object-cover" />
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 55%)' }} />
+            <div className="absolute inset-0 rounded-2xl" style={{ boxShadow: 'inset 0 0 0 1px rgba(14,165,233,0.15), inset 0 1px 0 rgba(255,255,255,0.08)' }} />
+          </motion.div>
+          <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+            className="absolute rounded-2xl overflow-hidden shadow-2xl"
+            style={{ width: 200, height: 280, top: '28%', left: '58%', rotate: '5deg', boxShadow: '0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.07)' }}>
+            <img src={HERO_IMGS[2]} alt="" className="w-full h-full object-cover" style={{ filter: 'brightness(0.8)' }} />
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%)' }} />
+          </motion.div>
+          {/* glow under cards */}
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-64 h-24 pointer-events-none" style={{ background: 'radial-gradient(ellipse, rgba(14,165,233,0.18) 0%, transparent 70%)', filter: 'blur(20px)' }} />
         </motion.div>
       </div>
 
@@ -160,7 +173,6 @@ function _OldHero() {
       </motion.div>
     </section>
   )
-// eslint-disable-next-line no-unreachable
 }
 
 export default function Home() {
