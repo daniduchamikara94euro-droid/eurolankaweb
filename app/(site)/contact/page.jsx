@@ -5,7 +5,7 @@ import ScrollReveal from '@/components/ScrollReveal'
 import GlassCard from '@/components/GlassCard'
 
 const contactInfo = [
-  { icon: '📍', label: 'Address', value: 'Colombo, Sri Lanka' },
+  { icon: '📍', label: 'Address', value: 'Wattegama, Kandy, Sri Lanka' },
   { icon: '📞', label: 'Phone',   value: '+94 77 697 0864' },
   { icon: '✉️', label: 'Email',   value: 'info@eurolanka.lk' },
   { icon: '🕒', label: 'Hours',   value: 'Mon–Sat: 8:30 AM – 6:00 PM' },
@@ -91,12 +91,12 @@ export default function Contact() {
               <GlassCard className="overflow-hidden">
                 <div className="relative h-48">
                   <img src="https://images.unsplash.com/photo-1580674684081-7617fbf3d745?auto=format&fit=crop&w=600&h=300&q=80"
-                    alt="Colombo, Sri Lanka" className="w-full h-full object-cover" loading="lazy" />
+                    alt="Wattegama, Kandy, Sri Lanka" className="w-full h-full object-cover" loading="lazy" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-4 flex items-center gap-2">
                     <span className="text-2xl">📍</span>
                     <div>
-                      <p className="text-white text-sm font-semibold">Colombo, Sri Lanka</p>
+                      <p className="text-white text-sm font-semibold">Wattegama, Kandy, Sri Lanka</p>
                       <p className="text-slate-400 text-xs">Mon–Sat · 8:30 AM – 6:00 PM</p>
                     </div>
                   </div>
