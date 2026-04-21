@@ -6,7 +6,7 @@ import GlassCard from '@/components/GlassCard'
 
 const contactInfo = [
   { icon: '📍', label: 'Address', value: 'Colombo, Sri Lanka' },
-  { icon: '📞', label: 'Phone',   value: '+94 XX XXX XXXX' },
+  { icon: '📞', label: 'Phone',   value: '+94 77 697 0864' },
   { icon: '✉️', label: 'Email',   value: 'info@eurolanka.lk' },
   { icon: '🕒', label: 'Hours',   value: 'Mon–Sat: 8:30 AM – 6:00 PM' },
 ]

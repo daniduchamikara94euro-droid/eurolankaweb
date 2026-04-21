@@ -36,7 +36,7 @@ export default function Footer() {
           <h4 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Contact</h4>
           <ul className="space-y-2 text-sm text-slate-400">
             <li>📍 Sri Lanka</li>
-            <li>📞 +94 XX XXX XXXX</li>
+            <li>📞 +94 77 697 0864</li>
             <li>✉️ info@eurolanka.lk</li>
             <li className="flex items-center gap-2 pt-2">
               <span className="text-xs bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full">🇨🇳 Direct China Imports</span>
