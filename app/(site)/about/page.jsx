@@ -2,13 +2,12 @@ import ScrollReveal from '@/components/ScrollReveal'
 import GlassCard from '@/components/GlassCard'
 
 const milestones = [
-  { year: '1998', title: 'Euro Steel Founded',         desc: 'Euro Steel established in Sri Lanka, laying the foundation for what would become a leading furniture solutions company.' },
-  { year: '2005', title: 'Melamine Furniture',          desc: 'Expanded into melamine furniture production, bringing modern manufacturing techniques to Sri Lanka\'s furniture industry.' },
-  { year: '2017', title: 'First Shipment',              desc: 'First direct container shipped from Guangzhou, China with 50+ product varieties.' },
-  { year: '2019', title: 'Expansion',                   desc: 'Expanded to serve over 200 furniture businesses and interior designers across Sri Lanka.' },
-  { year: '2021', title: 'Quality Program',             desc: 'Launched strict QC program with in-factory inspection before every shipment.' },
-  { year: '2023', title: 'Digital Presence',            desc: 'Launched online catalog and expanded product range to 500+ items.' },
-  { year: '2024', title: '1200+ Clients',               desc: 'Reached milestone of 1200+ satisfied clients. Trusted name in furniture accessories.' },
+  { year: '1998', title: 'Euro Steel Founded',  desc: 'Euro Steel established in Sri Lanka, laying the foundation for what would become a leading furniture solutions company.' },
+  { year: '2005', title: 'Melamine Furniture',  desc: 'Expanded into melamine furniture production, bringing modern manufacturing techniques to Sri Lanka\'s furniture industry.' },
+  { year: '2015', title: 'First Shipment',      desc: 'First direct container shipped from China, marking the beginning of our international sourcing journey.' },
+  { year: '2020', title: 'Euro Lanka Founded',  desc: 'Euro Lanka established to bring world-class furniture accessories from China\'s top manufacturers directly to Sri Lanka.' },
+  { year: '2021', title: 'Quality Program',     desc: 'Launched strict QC program with in-factory inspection before every shipment.' },
+  { year: '2022', title: 'Digital Presence',    desc: 'Launched online catalog with 40+ premium product varieties, making our range accessible nationwide.' },
 ]
 
 const values = [
@@ -39,10 +38,10 @@ export default function About() {
               <div>
                 <h2 className="text-3xl font-bold text-white mb-4">Our Story</h2>
                 <p className="text-slate-400 leading-relaxed mb-4">
-                  Founded in 1998 as Euro Steel, we began with a vision to deliver quality furniture solutions to Sri Lanka. In 2005, we expanded into melamine furniture production, embracing modern manufacturing to serve the growing local market.
+                  Our journey began in 1998 with Euro Steel, delivering quality furniture solutions across Sri Lanka. In 2005, we expanded into melamine furniture production, and by 2015 we had established our first direct shipment from China.
                 </p>
                 <p className="text-slate-400 leading-relaxed">
-                  Building on decades of experience, we now source world-class furniture accessories directly from China's top manufacturers — serving hundreds of furniture businesses, interior designers, and homeowners across the island.
+                  In 2020, Euro Lanka was founded to bring world-class furniture accessories directly from China's top manufacturers to Sri Lanka's furniture industry, building on over two decades of expertise.
                 </p>
               </div>
             </div>
