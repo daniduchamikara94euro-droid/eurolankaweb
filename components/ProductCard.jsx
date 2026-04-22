@@ -62,8 +62,7 @@ export default function ProductCard({ product, delay = 0, onClick }) {
       <div className="p-4 sm:p-5">
         <h3 className="font-semibold text-white text-base sm:text-lg mb-1 group-hover:text-sky-400 transition-colors">{product.name}</h3>
         <p className="text-slate-400 text-sm mb-3 line-clamp-2">{product.description}</p>
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-sky-400 font-bold text-base sm:text-lg">{product.price}</span>
+        <div className="flex items-center justify-end gap-2">
           <button
             onClick={(e) => { e.stopPropagation(); onClick?.() }}
             className="px-4 py-2 rounded-lg text-xs font-semibold bg-gradient-to-r from-sky-500 to-blue-600 text-white glow-btn flex-shrink-0">

@@ -616,11 +616,6 @@ function ProductForm({ initial, onSave, onCancel, allProducts }) {
             <input type="text" value={form.emoji} onChange={e => set('emoji', e.target.value)}
               className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-sky-500/60 transition-colors" />
           </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-400 mb-1">Price</label>
-            <input type="text" value={form.price} onChange={e => set('price', e.target.value)} placeholder="e.g. LKR 450+"
-              className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-sky-500/60 transition-colors" />
-          </div>
           <div className="col-span-2">
             <label className="block text-xs font-semibold text-slate-400 mb-1">Product Image</label>
             <ImageUploader value={form.img} onChange={val => set('img', val)} />
@@ -1144,7 +1139,6 @@ function AdminPanel() {
                     <tr className="border-b border-white/8 text-slate-500 text-xs uppercase tracking-wider">
                       <th className="text-left py-3 px-3">Product</th>
                       <th className="text-left py-3 px-3">Category</th>
-                      <th className="text-left py-3 px-3">Price</th>
                       <th className="text-center py-3 px-3">Featured</th>
                       <th className="text-right py-3 px-3">Actions</th>
                     </tr>
@@ -1169,7 +1163,6 @@ function AdminPanel() {
                         <td className="py-3 px-3">
                           <span className="px-2 py-1 rounded-full text-xs bg-sky-500/15 text-sky-400 border border-sky-500/20">{p.category}</span>
                         </td>
-                        <td className="py-3 px-3 text-slate-300">{p.price}</td>
                         <td className="py-3 px-3 text-center">
                           <button onClick={() => setFeatured(p.id, !featuredIds.includes(p.id))}
                             title={featuredIds.includes(p.id) ? 'Remove from featured' : featuredIds.length >= 4 ? 'Max 4 featured' : 'Add to featured'}
