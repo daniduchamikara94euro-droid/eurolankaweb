@@ -15,10 +15,23 @@ const buildInitialSelected = (product) => {
   return initial
 }
 
+const buildInitialSubColor = (product) => {
+  const sel = buildInitialSelected(product)
+  const initial = {}
+  product?.variants?.forEach((v) => {
+    if (v.type !== 'color') {
+      const opt = v.options?.find(o => getOptValue(o) === sel[v.name])
+      if (opt?.colors?.length > 0) initial[v.name] = opt.colors[0]?.label ?? ''
+    }
+  })
+  return initial
+}
+
 export default function ProductModal({ product, onClose }) {
   const [imgError, setImgError] = useState(false)
   const [activeImg, setActiveImg] = useState(product?.img)
   const [selected, setSelected] = useState(() => buildInitialSelected(product))
+  const [selectedSubColor, setSelectedSubColor] = useState(() => buildInitialSubColor(product))
   const [lastChanged, setLastChanged] = useState(null)
 
   useEffect(() => {
@@ -26,6 +39,7 @@ export default function ProductModal({ product, onClose }) {
     setActiveImg(product.img)
     setImgError(false)
     setSelected(buildInitialSelected(product))
+    setSelectedSubColor(buildInitialSubColor(product))
     setLastChanged(null)
   }, [product])
 
@@ -44,6 +58,13 @@ export default function ProductModal({ product, onClose }) {
     setLastChanged(variantName)
     setImgError(false)
     setActiveImg(opt.img || product.img)
+  }
+
+  const handleSubColorSelect = (variantName, subColor) => {
+    setSelectedSubColor(s => ({ ...s, [variantName]: subColor.label }))
+    setLastChanged(variantName)
+    setImgError(false)
+    setActiveImg(subColor.img || product.img)
   }
 
   if (!product) return null
@@ -101,6 +122,12 @@ export default function ProductModal({ product, onClose }) {
                   for (const v of variants) {
                     const selVal = selected[v.name]
                     const opt = v.options.find(o => (v.type === 'color' ? o.label : getOptValue(o)) === selVal)
+                    if (v.type !== 'color' && opt?.colors?.length > 0) {
+                      const subColorLabel = selectedSubColor[v.name]
+                      const colorOpt = opt.colors.find(c => c.label === subColorLabel)
+                      const cp = colorOpt?.price?.trim()
+                      if (cp) { price = cp; break }
+                    }
                     const p = getOptPrice(opt)
                     if (p) { price = p; break }
                   }
@@ -123,13 +150,18 @@ export default function ProductModal({ product, onClose }) {
                 const selectedOpt = variant.type === 'color'
                   ? variant.options.find(o => o.label === selected[variant.name])
                   : variant.options.find(o => getOptValue(o) === selected[variant.name])
-                const selectedIsDisabled = isOptDisabled(selectedOpt)
+                const selectedSubColorOpt = (variant.type !== 'color' && selectedOpt?.colors?.length > 0)
+                  ? selectedOpt.colors.find(c => c.label === selectedSubColor[variant.name])
+                  : null
+                const selectedIsDisabled = isOptDisabled(selectedOpt) || (selectedSubColorOpt?.disabled === true)
                 return (
                   <div key={variant.name} className="flex flex-col gap-2">
                     <div className="flex items-center gap-2 text-sm flex-wrap">
                       <span className="text-slate-300 font-semibold">{variant.name}</span>
                       <span className="text-slate-600">·</span>
-                      <span className={`font-medium ${selectedIsDisabled ? 'text-slate-500 line-through' : 'text-sky-400'}`}>{selected[variant.name]}</span>
+                      <span className={`font-medium ${selectedIsDisabled ? 'text-slate-500 line-through' : 'text-sky-400'}`}>
+                        {selected[variant.name]}{selectedSubColorOpt ? ` · ${selectedSubColorOpt.label}` : ''}
+                      </span>
                       {selectedIsDisabled && (
                         <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/30 leading-none">Out of Stock</span>
                       )}
@@ -163,38 +195,114 @@ export default function ProductModal({ product, onClose }) {
                     )}
 
                     {variant.type === 'size' && (
-                      <div className="flex flex-wrap gap-2">
-                        {variant.options.map((opt) => {
-                          const val = getOptValue(opt)
-                          const disabled = isOptDisabled(opt)
-                          const isActive = selected[variant.name] === val
+                      <div className="flex flex-col gap-3">
+                        <div className="flex flex-wrap gap-2">
+                          {variant.options.map((opt) => {
+                            const val = getOptValue(opt)
+                            const disabled = isOptDisabled(opt)
+                            const isActive = selected[variant.name] === val
+                            return (
+                              <button key={val} onClick={() => {
+                                if (!disabled) {
+                                  setSelected((s) => ({ ...s, [variant.name]: val }))
+                                  setLastChanged(variant.name)
+                                  const firstColor = (typeof opt === 'object' ? opt.colors?.[0]?.label : undefined) ?? ''
+                                  setSelectedSubColor(s => ({ ...s, [variant.name]: firstColor }))
+                                }
+                              }}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all duration-200 ${
+                                  disabled ? 'border-white/5 text-slate-600 cursor-not-allowed line-through'
+                                    : isActive ? 'bg-sky-500 border-sky-400 text-white shadow-lg shadow-sky-500/25'
+                                    : 'glass border-white/10 text-slate-300 hover:border-sky-500/40 hover:text-white'
+                                }`}>{val}</button>
+                            )
+                          })}
+                        </div>
+                        {(() => {
+                          const selOpt = variant.options.find(o => getOptValue(o) === selected[variant.name])
+                          if (!selOpt?.colors?.length) return null
                           return (
-                            <button key={val} onClick={() => { if (!disabled) { setSelected((s) => ({ ...s, [variant.name]: val })); setLastChanged(variant.name) } }}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all duration-200 ${
-                                disabled ? 'border-white/5 text-slate-600 cursor-not-allowed line-through'
-                                  : isActive ? 'bg-sky-500 border-sky-400 text-white shadow-lg shadow-sky-500/25'
-                                  : 'glass border-white/10 text-slate-300 hover:border-sky-500/40 hover:text-white'
-                              }`}>{val}</button>
+                            <div className="flex flex-col gap-2">
+                              <span className="text-xs text-slate-500">{selectedSubColor[variant.name] || '—'}</span>
+                              <div className="flex flex-wrap gap-2">
+                                {selOpt.colors.map((c) => {
+                                  const dis = c.disabled === true
+                                  const isAct = selectedSubColor[variant.name] === c.label
+                                  return (
+                                    <button key={c.label} title={dis ? `${c.label} — Out of Stock` : c.label}
+                                      onClick={() => !dis && handleSubColorSelect(variant.name, c)}
+                                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all duration-200 ${
+                                        dis ? 'border-white/5 text-slate-600 cursor-not-allowed line-through'
+                                          : isAct ? 'bg-sky-500 border-sky-400 text-white shadow-lg shadow-sky-500/25'
+                                          : 'glass border-white/10 text-slate-300 hover:border-sky-500/40 hover:text-white'
+                                      }`}>
+                                      {c.hex && (
+                                        <span className="w-3 h-3 rounded-full flex-shrink-0 border border-white/20" style={{ backgroundColor: c.hex }} />
+                                      )}
+                                      {c.label}
+                                    </button>
+                                  )
+                                })}
+                              </div>
+                            </div>
                           )
-                        })}
+                        })()}
                       </div>
                     )}
 
                     {variant.type === 'type' && (
-                      <div className="flex flex-wrap gap-2">
-                        {variant.options.map((opt) => {
-                          const val = getOptValue(opt)
-                          const disabled = isOptDisabled(opt)
-                          const isActive = selected[variant.name] === val
+                      <div className="flex flex-col gap-3">
+                        <div className="flex flex-wrap gap-2">
+                          {variant.options.map((opt) => {
+                            const val = getOptValue(opt)
+                            const disabled = isOptDisabled(opt)
+                            const isActive = selected[variant.name] === val
+                            return (
+                              <button key={val} onClick={() => {
+                                if (!disabled) {
+                                  setSelected((s) => ({ ...s, [variant.name]: val }))
+                                  setLastChanged(variant.name)
+                                  const firstColor = (typeof opt === 'object' ? opt.colors?.[0]?.label : undefined) ?? ''
+                                  setSelectedSubColor(s => ({ ...s, [variant.name]: firstColor }))
+                                }
+                              }}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all duration-200 ${
+                                  disabled ? 'border-white/5 text-slate-600 cursor-not-allowed line-through'
+                                    : isActive ? 'bg-gradient-to-r from-sky-500 to-blue-600 border-transparent text-white shadow-lg shadow-sky-500/25'
+                                    : 'glass border-white/10 text-slate-300 hover:border-sky-500/40 hover:text-white'
+                                }`}>{val}</button>
+                            )
+                          })}
+                        </div>
+                        {(() => {
+                          const selOpt = variant.options.find(o => getOptValue(o) === selected[variant.name])
+                          if (!selOpt?.colors?.length) return null
                           return (
-                            <button key={val} onClick={() => { if (!disabled) { setSelected((s) => ({ ...s, [variant.name]: val })); setLastChanged(variant.name) } }}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all duration-200 ${
-                                disabled ? 'border-white/5 text-slate-600 cursor-not-allowed line-through'
-                                  : isActive ? 'bg-gradient-to-r from-sky-500 to-blue-600 border-transparent text-white shadow-lg shadow-sky-500/25'
-                                  : 'glass border-white/10 text-slate-300 hover:border-sky-500/40 hover:text-white'
-                              }`}>{val}</button>
+                            <div className="flex flex-col gap-2">
+                              <span className="text-xs text-slate-500">{selectedSubColor[variant.name] || '—'}</span>
+                              <div className="flex flex-wrap gap-2">
+                                {selOpt.colors.map((c) => {
+                                  const dis = c.disabled === true
+                                  const isAct = selectedSubColor[variant.name] === c.label
+                                  return (
+                                    <button key={c.label} title={dis ? `${c.label} — Out of Stock` : c.label}
+                                      onClick={() => !dis && handleSubColorSelect(variant.name, c)}
+                                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all duration-200 ${
+                                        dis ? 'border-white/5 text-slate-600 cursor-not-allowed line-through'
+                                          : isAct ? 'bg-gradient-to-r from-sky-500 to-blue-600 border-transparent text-white shadow-lg shadow-sky-500/25'
+                                          : 'glass border-white/10 text-slate-300 hover:border-sky-500/40 hover:text-white'
+                                      }`}>
+                                      {c.hex && (
+                                        <span className="w-3 h-3 rounded-full flex-shrink-0 border border-white/20" style={{ backgroundColor: c.hex }} />
+                                      )}
+                                      {c.label}
+                                    </button>
+                                  )
+                                })}
+                              </div>
+                            </div>
                           )
-                        })}
+                        })()}
                       </div>
                     )}
                   </div>

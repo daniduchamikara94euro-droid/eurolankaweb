@@ -163,6 +163,8 @@ function VariantImagePicker({ value, onChange }) {
 
 /* ── Variant Builder ── */
 function VariantBuilder({ variants, onChange }) {
+  const [expandedColors, setExpandedColors] = useState(new Set())
+
   const addVariant = () => onChange([...variants, { name: '', type: 'color', options: [] }])
   const removeVariant = (vi) => onChange(variants.filter((_, i) => i !== vi))
   const updateVariant = (vi, field, val) => {
@@ -172,11 +174,37 @@ function VariantBuilder({ variants, onChange }) {
   }
   const addOption = (vi) => {
     const v = variants[vi]
-    const newOpt = v.type === 'color' ? { label: '', hex: '#888888', img: '', price: '', disabled: false } : { value: '', price: '', disabled: false }
+    const newOpt = v.type === 'color'
+      ? { label: '', hex: '#888888', img: '', price: '', disabled: false }
+      : { value: '', price: '', disabled: false, colors: [] }
     onChange(variants.map((vv, i) => i === vi ? { ...vv, options: [...vv.options, newOpt] } : vv))
   }
   const removeOption = (vi, oi) => onChange(variants.map((vv, i) => i === vi ? { ...vv, options: vv.options.filter((_, j) => j !== oi) } : vv))
   const updateOption = (vi, oi, val) => onChange(variants.map((vv, i) => i === vi ? { ...vv, options: vv.options.map((o, j) => j === oi ? val : o) } : vv))
+
+  const toggleExpandColors = (vi, oi) => {
+    const key = `${vi}-${oi}`
+    setExpandedColors(prev => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  }
+  const addSubColor = (vi, oi, optObj) => {
+    const newColor = { label: '', hex: '', price: '', img: '', disabled: false }
+    updateOption(vi, oi, { ...optObj, colors: [...(optObj.colors || []), newColor] })
+    setExpandedColors(prev => new Set(prev).add(`${vi}-${oi}`))
+  }
+  const updateSubColor = (vi, oi, ci, optObj, val) => {
+    const colors = [...(optObj.colors || [])]
+    colors[ci] = val
+    updateOption(vi, oi, { ...optObj, colors })
+  }
+  const removeSubColor = (vi, oi, ci, optObj) => {
+    const colors = (optObj.colors || []).filter((_, j) => j !== ci)
+    updateOption(vi, oi, { ...optObj, colors })
+  }
 
   return (
     <div className="space-y-4">
@@ -207,10 +235,10 @@ function VariantBuilder({ variants, onChange }) {
           </div>
 
           <div className="space-y-2 pl-2">
-            {v.options.map((opt, oi) => (
-              <div key={oi} className="flex flex-wrap gap-2 items-center">
-                {v.type === 'color' ? (
-                  <>
+            {v.options.map((opt, oi) => {
+              if (v.type === 'color') {
+                return (
+                  <div key={oi} className="flex flex-wrap gap-2 items-center">
                     <input type="text" value={opt.label} onChange={e => updateOption(vi, oi, { ...opt, label: e.target.value })}
                       placeholder="Label" className="w-20 px-2 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-sky-500/60 flex-shrink-0" />
                     <input type="color" value={opt.hex} onChange={e => updateOption(vi, oi, { ...opt, hex: e.target.value })}
@@ -225,27 +253,73 @@ function VariantBuilder({ variants, onChange }) {
                     </button>
                     <button type="button" onClick={() => removeOption(vi, oi)}
                       className="text-slate-500 hover:text-red-400 text-xs px-1 transition-colors flex-shrink-0">✕</button>
-                  </>
-                ) : (() => {
-                  const optObj = typeof opt === 'string' ? { value: opt, price: '', disabled: false } : opt
-                  return (
-                    <>
-                      <input type="text" value={optObj.value} onChange={e => updateOption(vi, oi, { ...optObj, value: e.target.value })}
-                        placeholder="Option value" className="flex-1 px-2 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-sky-500/60" />
+                  </div>
+                )
+              }
+              // size / type options — support nested sub-colors
+              const optObj = typeof opt === 'string' ? { value: opt, price: '', disabled: false, colors: [] } : { colors: [], ...opt }
+              const hasSubs = optObj.colors.length > 0
+              const isExpanded = expandedColors.has(`${vi}-${oi}`) || hasSubs
+              return (
+                <div key={oi} className="border border-white/8 rounded-xl p-3 space-y-2.5">
+                  {/* main row */}
+                  <div className="flex flex-wrap gap-2 items-center">
+                    <input type="text" value={optObj.value} onChange={e => updateOption(vi, oi, { ...optObj, value: e.target.value })}
+                      placeholder="Option value (e.g. 18mm)" className="flex-1 min-w-[90px] px-2 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-sky-500/60" />
+                    {!hasSubs && (
                       <input type="text" value={optObj.price ?? ''} onChange={e => updateOption(vi, oi, { ...optObj, price: e.target.value })}
-                        placeholder="Price (optional)" className="w-28 px-2 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-sky-500/60" />
-                      <button type="button" title={optObj.disabled ? 'Mark as available' : 'Mark as out of stock'}
-                        onClick={() => updateOption(vi, oi, { ...optObj, disabled: !optObj.disabled })}
-                        className={`w-[72px] text-center py-1.5 rounded-lg text-xs font-semibold border transition-colors flex-shrink-0 ${optObj.disabled ? 'bg-red-500/15 text-red-400 border-red-500/30' : 'text-slate-500 border-white/10 hover:text-amber-400 hover:border-amber-500/30'}`}>
-                        {optObj.disabled ? 'OOS' : 'In Stock'}
-                      </button>
-                      <button type="button" onClick={() => removeOption(vi, oi)}
-                        className="text-slate-500 hover:text-red-400 text-xs px-1 transition-colors">✕</button>
-                    </>
-                  )
-                })()}
-              </div>
-            ))}
+                        placeholder="Price" className="w-24 px-2 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-sky-500/60" />
+                    )}
+                    <button type="button" title={optObj.disabled ? 'Mark as available' : 'Mark as out of stock'}
+                      onClick={() => updateOption(vi, oi, { ...optObj, disabled: !optObj.disabled })}
+                      className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-colors flex-shrink-0 ${optObj.disabled ? 'bg-red-500/15 text-red-400 border-red-500/30' : 'text-slate-500 border-white/10 hover:text-amber-400 hover:border-amber-500/30'}`}>
+                      {optObj.disabled ? 'OOS' : 'Stock'}
+                    </button>
+                    <button type="button" onClick={() => toggleExpandColors(vi, oi)}
+                      className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-colors flex-shrink-0 ${hasSubs ? 'bg-purple-500/15 text-purple-400 border-purple-500/30' : 'text-slate-500 border-white/10 hover:text-purple-400 hover:border-purple-500/30'}`}>
+                      {hasSubs ? `⊕ ${optObj.colors.length} sub-opt${optObj.colors.length !== 1 ? 's' : ''}` : '+ Sub-options'}
+                    </button>
+                    <button type="button" onClick={() => removeOption(vi, oi)}
+                      className="text-slate-500 hover:text-red-400 text-xs px-1 transition-colors">✕</button>
+                  </div>
+
+                  {/* sub-options section */}
+                  {isExpanded && (
+                    <div className="pl-3 border-l-2 border-purple-500/20 space-y-2">
+                      {optObj.colors.map((sc, ci) => (
+                        <div key={ci} className="flex flex-wrap gap-1.5 items-center">
+                          <input type="text" value={sc.label} onChange={e => updateSubColor(vi, oi, ci, optObj, { ...sc, label: e.target.value })}
+                            placeholder="Option name" className="w-24 px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-sky-500/60" />
+                          {/* optional color dot */}
+                          <div className="relative flex-shrink-0" title="Color indicator (optional)">
+                            <input type="color" value={sc.hex || '#888888'} onChange={e => updateSubColor(vi, oi, ci, optObj, { ...sc, hex: e.target.value })}
+                              className="w-7 h-7 rounded cursor-pointer bg-transparent border border-white/10 opacity-0 absolute inset-0" />
+                            <div className="w-7 h-7 rounded border border-white/10 flex items-center justify-center pointer-events-none"
+                              style={{ background: sc.hex || 'rgba(255,255,255,0.05)' }}>
+                              {!sc.hex && <span className="text-slate-600 text-[10px]">●</span>}
+                            </div>
+                          </div>
+                          <VariantImagePicker value={sc.img ?? ''} onChange={val => updateSubColor(vi, oi, ci, optObj, { ...sc, img: val })} />
+                          <input type="text" value={sc.price ?? ''} onChange={e => updateSubColor(vi, oi, ci, optObj, { ...sc, price: e.target.value })}
+                            placeholder="Price" className="w-20 px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-sky-500/60" />
+                          <button type="button" onClick={() => updateSubColor(vi, oi, ci, optObj, { ...sc, disabled: !sc.disabled })}
+                            className={`px-2 py-1 rounded-lg text-xs border transition-colors flex-shrink-0 ${sc.disabled ? 'bg-red-500/15 text-red-400 border-red-500/30' : 'text-slate-500 border-white/10 hover:text-amber-400 hover:border-amber-500/30'}`}>
+                            {sc.disabled ? 'OOS' : 'In Stock'}
+                          </button>
+                          <button type="button" onClick={() => removeSubColor(vi, oi, ci, optObj)}
+                            className="text-slate-500 hover:text-red-400 text-xs transition-colors">✕</button>
+                        </div>
+                      ))}
+                      <button type="button" onClick={() => addSubColor(vi, oi, optObj)}
+                        className="text-xs text-purple-400 hover:text-purple-300 transition-colors">+ Add sub-option</button>
+                      {hasSubs && (
+                        <p className="text-[10px] text-slate-600 italic">Price set per sub-option — option-level price is ignored.</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
             <button type="button" onClick={() => addOption(vi)} className="text-xs text-sky-400 hover:text-sky-300 transition-colors">
               + Add option
             </button>
