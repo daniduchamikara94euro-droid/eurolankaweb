@@ -130,7 +130,7 @@ function Hero() {
 
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
             className="flex gap-8 pt-4 border-t border-white/6">
-            {[['500+', 'Products'], ['1200+', 'Clients'], ['8+', 'Years']].map(([val, lbl]) => (
+            {[['50+', 'Products'], ['1000+', 'Clients'], ['25+', 'Years']].map(([val, lbl]) => (
               <div key={lbl}>
                 <div className="text-2xl font-black gradient-text">{val}</div>
                 <div className="text-xs text-slate-500 uppercase tracking-widest">{lbl}</div>
@@ -193,7 +193,7 @@ export default function Home() {
           <ScrollReveal>
             <div className="text-center mb-20">
               <span className="tag mb-4 inline-block">Why Us</span>
-              <h2 className="section-heading gradient-text">Why Choose Euro Lanka?</h2>
+              <h2 className="section-heading gradient-text px-2">Why Choose Euro Lanka?</h2>
               <p className="section-sub">We bridge the gap between world-class Chinese manufacturing and Sri Lankan excellence.</p>
             </div>
           </ScrollReveal>
@@ -249,17 +249,13 @@ export default function Home() {
                     <p className="text-slate-500 leading-relaxed text-sm flex-1">{f.desc}</p>
 
                     {/* bottom accent line */}
-                    <div className="mt-8 flex items-center gap-3">
-                      <div className="h-px flex-1 transition-all duration-700 origin-left"
+                    <div className="mt-8">
+                      <div className="h-px transition-all duration-700 origin-left"
                         style={{ background: `linear-gradient(to right, ${['rgba(14,165,233,0.6)','rgba(129,140,248,0.6)','rgba(168,85,247,0.6)'][i]}, transparent)`,
                           transform: 'scaleX(0.3)', opacity: 0.4 }} ref={el => {
                           if (el) el.closest('.group') && el.closest('.group').addEventListener('mouseenter', () => { el.style.transform = 'scaleX(1)'; el.style.opacity = '1' }, { once: false })
                           if (el) el.closest('.group') && el.closest('.group').addEventListener('mouseleave', () => { el.style.transform = 'scaleX(0.3)'; el.style.opacity = '0.4' }, { once: false })
                         }} />
-                      <span className="text-xs font-semibold tracking-widest uppercase"
-                        style={{ color: ['rgba(14,165,233,0.5)','rgba(129,140,248,0.5)','rgba(168,85,247,0.5)'][i] }}>
-                        Learn more
-                      </span>
                     </div>
                   </div>
                 </motion.div>
@@ -269,45 +265,8 @@ export default function Home() {
         </div>
       </section>
 
-      <SlideGallery />
 
-      <section className="py-28 px-6 relative">
-        <div className="absolute inset-0 bg-grid opacity-30" />
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-500/30 to-transparent" />
-        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 60% 40% at 50% 100%, rgba(129,140,248,0.07) 0%, transparent 70%)' }} />
-        <div className="max-w-6xl mx-auto relative">
-          <ScrollReveal>
-            <div className="text-center mb-16">
-              <span className="tag mb-4 inline-block">Collection</span>
-              <h2 className="section-heading gradient-text">Featured Products</h2>
-              <p className="section-sub">Handpicked accessories that define modern furniture craftsmanship.</p>
-            </div>
-          </ScrollReveal>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((p, i) => (
-              <ProductCard key={p.id} product={p} delay={i * 0.1} onClick={() => setSelectedProduct(p)} />
-            ))}
-          </div>
-          <ScrollReveal className="text-center mt-14">
-            <Link href="/products" className="glow-btn inline-block px-10 py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600" data-hover>
-              View All Products →
-            </Link>
-          </ScrollReveal>
-        </div>
-      </section>
 
-      <section className="py-24 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="neon-card p-12 grid grid-cols-2 md:grid-cols-4 gap-8 relative overflow-hidden">
-            <div className="absolute inset-0 bg-grid opacity-30" />
-            <div className="orb w-64 h-64 bg-sky-600/10 -top-10 -left-10" style={{ filter: 'blur(60px)' }} />
-            <div className="orb w-48 h-48 bg-indigo-600/10 -bottom-10 -right-10" style={{ filter: 'blur(60px)' }} />
-            {stats.map((s) => (
-              <div key={s.label} className="relative z-10"><StatItem {...s} /></div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       <section className="py-24 px-6">
         <ScrollReveal>

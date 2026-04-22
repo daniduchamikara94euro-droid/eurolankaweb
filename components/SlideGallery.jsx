@@ -60,10 +60,6 @@ export default function SlideGallery() {
     <section ref={ref} className="py-24 overflow-hidden relative" style={{ background: '#020810' }}>
       <div className="absolute inset-0 bg-grid opacity-30 pointer-events-none" />
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
-      <div className="max-w-6xl mx-auto px-6 mb-14 text-center">
-        <h2 className="section-heading gradient-text">Our Collection</h2>
-        <p className="section-sub">Thousands of premium furniture accessories — sourced, tested, and delivered.</p>
-      </div>
       <div className="slide-gallery-mask flex flex-col gap-5">
         <motion.div style={{ x: x1 }} className="flex gap-5 px-8">
           {pad1.map((item, i) => <GalleryCard key={i} {...item} />)}

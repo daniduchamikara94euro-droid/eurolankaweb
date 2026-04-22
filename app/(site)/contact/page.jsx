@@ -12,7 +12,7 @@ const contactInfo = [
 ]
 
 export default function Contact() {
-  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
+  const [form, setForm] = useState({ name: '', email: '', phone: '+94', message: '' })
   const [errors, setErrors] = useState({})
   const [submitted, setSubmitted] = useState(false)
 
@@ -30,11 +30,15 @@ export default function Contact() {
     const e = validate()
     if (Object.keys(e).length) { setErrors(e); return }
     setErrors({})
+    const text = `Hello Euro Lanka!\n\n*Name:* ${form.name}\n*Email:* ${form.email}${form.phone ? `\n*Phone:* ${form.phone}` : ''}\n\n*Message:*\n${form.message}`
+    window.open(`https://wa.me/94776970864?text=${encodeURIComponent(text)}`, '_blank')
     setSubmitted(true)
   }
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
+    let value = e.target.value
+    if (e.target.name === 'phone' && !value.startsWith('+94')) value = '+94'
+    setForm({ ...form, [e.target.name]: value })
     if (errors[e.target.name]) setErrors({ ...errors, [e.target.name]: '' })
   }
 
@@ -114,11 +118,17 @@ export default function Contact() {
               <GlassCard className="p-8">
                 {submitted ? (
                   <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-12">
-                    <div className="text-6xl mb-4">✅</div>
-                    <h3 className="text-2xl font-bold text-white mb-2">Message Sent!</h3>
-                    <p className="text-slate-400">Thank you for reaching out. We'll get back to you within 24 hours.</p>
-                    <button onClick={() => { setForm({ name: '', email: '', phone: '', message: '' }); setSubmitted(false) }}
-                      className="mt-6 px-6 py-3 rounded-xl glass border border-white/10 text-slate-300 hover:text-white hover:border-sky-500/40 transition-all text-sm">
+                    <div className="text-6xl mb-4">💬</div>
+                    <h3 className="text-2xl font-bold text-white mb-2">Opening WhatsApp!</h3>
+                    <p className="text-slate-400 mb-6">Your message has been prepared. Complete sending it via WhatsApp to reach us instantly.</p>
+                    <p className="text-slate-500 text-sm mb-3">WhatsApp not opening?</p>
+                    <a href={`mailto:info@eurolanka.lk?subject=Enquiry from ${encodeURIComponent(form.name)}&body=${encodeURIComponent(`Name: ${form.name}\nEmail: ${form.email}${form.phone ? `\nPhone: ${form.phone}` : ''}\n\nMessage:\n${form.message}`)}`}
+                      className="inline-block px-6 py-3 rounded-xl glass border border-sky-500/30 text-sky-400 hover:border-sky-500/60 transition-all text-sm mb-4">
+                      Send via Email instead →
+                    </a>
+                    <br />
+                    <button onClick={() => { setForm({ name: '', email: '', phone: '+94', message: '' }); setSubmitted(false) }}
+                      className="mt-2 px-6 py-3 rounded-xl glass border border-white/10 text-slate-300 hover:text-white hover:border-sky-500/40 transition-all text-sm">
                       Send Another Message
                     </button>
                   </motion.div>
@@ -139,7 +149,7 @@ export default function Contact() {
                     </div>
                     <div className="mb-5">
                       <label className="block text-xs text-slate-400 uppercase tracking-widest mb-2">Phone Number</label>
-                      <input type="tel" name="phone" value={form.phone} onChange={handleChange} placeholder="+94 XX XXX XXXX" className={inputClass('phone')} />
+                      <input type="tel" name="phone" value={form.phone} onChange={handleChange} placeholder="+94" className={inputClass('phone')} />
                     </div>
                     <div className="mb-7">
                       <label className="block text-xs text-slate-400 uppercase tracking-widest mb-2">Message *</label>
