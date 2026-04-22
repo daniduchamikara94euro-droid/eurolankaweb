@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useProducts } from '@/context/ProductsContext'
 import ProductCard from '@/components/ProductCard'
@@ -402,11 +402,102 @@ function ImageUploader({ value, onChange }) {
   )
 }
 
+/* ── Category Dropdown ── */
+function CategoryDropdown({ value, onChange, allProducts, error }) {
+  const [open, setOpen]     = useState(false)
+  const [newCat, setNewCat] = useState('')
+  const [categories, setCategories] = useState(() =>
+    [...new Set([...CATEGORIES, ...allProducts.map(p => p.category).filter(Boolean)])]
+  )
+  const ref    = useRef(null)
+  const inputRef = useRef(null)
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  useEffect(() => {
+    if (open) setTimeout(() => inputRef.current?.focus(), 50)
+  }, [open])
+
+  const select = (cat) => { onChange(cat); setOpen(false) }
+
+  const addCategory = () => {
+    const cat = newCat.trim()
+    if (!cat) return
+    if (!categories.includes(cat)) setCategories(prev => [...prev, cat])
+    select(cat)
+    setNewCat('')
+  }
+
+  const deleteCategory = (e, cat) => {
+    e.stopPropagation()
+    setCategories(prev => prev.filter(c => c !== cat))
+    if (value === cat) onChange(categories.filter(c => c !== cat)[0] || '')
+  }
+
+  return (
+    <div ref={ref} className="relative">
+      <button type="button" onClick={() => setOpen(o => !o)}
+        className={`w-full px-4 py-2.5 rounded-xl bg-[#0a1020] border text-left flex items-center justify-between focus:outline-none transition-colors ${error ? 'border-red-500/60' : open ? 'border-sky-500/60' : 'border-white/10 hover:border-white/20'}`}>
+        {value
+          ? <span className="text-white text-sm">{value}</span>
+          : <span className="text-slate-500 text-sm">Select category</span>}
+        <svg className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+      </button>
+
+      {open && (
+        <div className="absolute top-full left-0 right-0 mt-1.5 rounded-xl border border-white/10 shadow-2xl z-50 overflow-hidden"
+          style={{ background: '#0d1526' }}>
+
+          {/* category list */}
+          <div className="max-h-44 overflow-y-auto py-1">
+            {categories.length === 0 && (
+              <p className="text-slate-600 text-xs text-center py-3">No categories yet</p>
+            )}
+            {categories.map(cat => (
+              <div key={cat} onClick={() => select(cat)}
+                className={`group flex items-center justify-between px-4 py-2.5 cursor-pointer transition-colors ${value === cat ? 'bg-sky-500/15' : 'hover:bg-white/5'}`}>
+                <div className="flex items-center gap-2.5">
+                  {value === cat
+                    ? <svg className="w-3.5 h-3.5 text-sky-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg>
+                    : <span className="w-3.5 h-3.5 flex-shrink-0" />}
+                  <span className={`text-sm ${value === cat ? 'text-sky-400 font-semibold' : 'text-slate-300'}`}>{cat}</span>
+                </div>
+                <button type="button" onClick={e => deleteCategory(e, cat)}
+                  className="opacity-0 group-hover:opacity-100 w-5 h-5 rounded flex items-center justify-center text-slate-600 hover:text-red-400 hover:bg-red-400/10 transition-all text-xs">
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* divider + add new */}
+          <div className="border-t border-white/8 px-3 py-2.5 flex gap-2">
+            <input ref={inputRef} type="text" value={newCat}
+              onChange={e => setNewCat(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addCategory() } e.stopPropagation() }}
+              onClick={e => e.stopPropagation()}
+              placeholder="Add new category..."
+              className="flex-1 px-3 py-1.5 rounded-lg text-sm text-white placeholder-slate-600 focus:outline-none focus:border-sky-500/60 border border-white/8 transition-colors"
+              style={{ background: 'rgba(255,255,255,0.04)' }}
+            />
+            <button type="button" onClick={addCategory}
+              className="px-3 py-1.5 rounded-lg text-sm font-semibold text-sky-400 border border-sky-500/30 bg-sky-500/10 hover:bg-sky-500/20 transition-colors whitespace-nowrap">
+              + Add
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 /* ── Product Form ── */
 function ProductForm({ initial, onSave, onCancel, allProducts }) {
   const [form, setForm] = useState(initial || BLANK_PRODUCT)
-  const [customCategory, setCustomCategory] = useState('')
-  const [useCustom, setUseCustom] = useState(initial ? !CATEGORIES.includes(initial.category) : false)
   const [formErrors, setFormErrors] = useState({})
 
   const set = (field, val) => {
@@ -416,16 +507,15 @@ function ProductForm({ initial, onSave, onCancel, allProducts }) {
 
   const handleSubmit = (e) => {
     e?.preventDefault?.()
-    const category = useCustom ? customCategory.trim() : form.category
     const errors = {}
     if (!form.name.trim()) errors.name = 'Product name is required'
-    if (!category) errors.category = 'Category is required'
+    if (!form.category.trim()) errors.category = 'Category is required'
     if (Object.keys(errors).length) { setFormErrors(errors); return }
     setFormErrors({})
-    onSave({ ...form, category })
+    onSave({ ...form })
   }
 
-  const previewProduct = { ...form, category: useCustom ? customCategory || form.category : form.category }
+  const previewProduct = { ...form }
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
@@ -439,22 +529,13 @@ function ProductForm({ initial, onSave, onCancel, allProducts }) {
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-400 mb-1">Category *</label>
-            {useCustom ? (
-              <input type="text" value={customCategory} onChange={e => { setCustomCategory(e.target.value); if (formErrors.category) setFormErrors(p => ({...p, category: ''})) }} placeholder="Custom category"
-                className={`w-full px-4 py-2.5 rounded-xl bg-white/5 border text-white focus:outline-none focus:border-sky-500/60 transition-colors ${formErrors.category ? 'border-red-500/60' : 'border-white/10'}`} />
-            ) : (
-              <select value={form.category} onChange={e => set('category', e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl bg-[#0a1020] border border-white/10 text-white focus:outline-none focus:border-sky-500/60 transition-colors">
-                {[...new Set([...CATEGORIES, ...allProducts.map(p => p.category)])].map(c => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
-            )}
+            <CategoryDropdown
+              value={form.category}
+              onChange={val => set('category', val)}
+              allProducts={allProducts}
+              error={formErrors.category}
+            />
             {formErrors.category && <p className="text-red-400 text-xs mt-1">{formErrors.category}</p>}
-            <button type="button" onClick={() => { setUseCustom(!useCustom); setCustomCategory('') }}
-              className="text-xs text-sky-400 mt-1 hover:text-sky-300 transition-colors">
-              {useCustom ? '← Use existing' : '+ Custom category'}
-            </button>
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-400 mb-1">Emoji</label>
