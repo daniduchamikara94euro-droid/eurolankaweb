@@ -32,8 +32,8 @@ export default function About() {
           <ScrollReveal direction="right">
             <div className="flex flex-col gap-6">
               <div className="rounded-3xl overflow-hidden ring-2 ring-sky-500/30 shadow-2xl shadow-sky-500/10 h-64">
-                <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&h=400&q=80"
-                  alt="Modern furniture showroom" className="w-full h-full object-cover" />
+                <img src="/our-story.jpg"
+                  alt="Euro Lanka team at China factory visit" className="w-full h-full object-cover" />
               </div>
               <div>
                 <h2 className="text-3xl font-bold text-white mb-4">Our Story</h2>
