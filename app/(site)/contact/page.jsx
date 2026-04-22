@@ -90,10 +90,14 @@ export default function Contact() {
             <ScrollReveal direction="right" delay={0.2}>
               <GlassCard className="overflow-hidden">
                 <div className="relative h-48">
-                  <img src="https://images.unsplash.com/photo-1580674684081-7617fbf3d745?auto=format&fit=crop&w=600&h=300&q=80"
-                    alt="Wattegama, Kandy, Sri Lanka" className="w-full h-full object-cover" loading="lazy" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-4 flex items-center gap-2">
+                  <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31677.85!2d80.6715!3d7.3497!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae3660e7e3f1b5f%3A0x7a5c5c5c5c5c5c5c!2sWattegama%2C%20Sri%20Lanka!5e0!3m2!1sen!2slk!4v1680000000000"
+                    width="100%" height="100%" style={{ border: 0 }} allowFullScreen="" loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="Wattegama, Kandy, Sri Lanka"
+                    className="w-full h-full"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 p-4 flex items-center gap-2 bg-gradient-to-t from-black/70 to-transparent pointer-events-none">
                     <span className="text-2xl">📍</span>
                     <div>
                       <p className="text-white text-sm font-semibold">Wattegama, Kandy, Sri Lanka</p>
