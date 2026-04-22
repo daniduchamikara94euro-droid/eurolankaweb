@@ -415,7 +415,7 @@ function ProductForm({ initial, onSave, onCancel, allProducts }) {
   }
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e?.preventDefault?.()
     const category = useCustom ? customCategory.trim() : form.category
     const errors = {}
     if (!form.name.trim()) errors.name = 'Product name is required'
@@ -478,14 +478,14 @@ function ProductForm({ initial, onSave, onCancel, allProducts }) {
         </div>
         <VariantBuilder variants={form.variants} onChange={v => set('variants', v)} />
         <div className="flex gap-3 pt-2">
-          <button type="submit" className="flex-1 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-sky-500 to-blue-600 glow-btn">Save Product</button>
+          <button type="button" onClick={handleSubmit} className="flex-1 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-sky-500 to-blue-600 glow-btn">Save Product</button>
           <button type="button" onClick={onCancel}
             className="px-6 py-3 rounded-xl font-semibold glass border border-white/10 text-slate-300 hover:border-white/20 transition-colors">Cancel</button>
         </div>
       </form>
       <div className="space-y-3">
         <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Live Preview</p>
-        <div className="max-w-xs"><ProductCard product={previewProduct} /></div>
+        <div className="max-w-xs pointer-events-none select-none"><ProductCard product={previewProduct} /></div>
       </div>
     </div>
   )
