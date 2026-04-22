@@ -999,7 +999,12 @@ function AdminPanel() {
                       <tr key={p.id} className="hover:bg-white/3 transition-colors group">
                         <td className="py-3 px-3">
                           <div className="flex items-center gap-3">
-                            <span className="text-2xl">{p.emoji}</span>
+                            <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 border border-white/10 bg-white/5">
+                              {p.img
+                                ? <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
+                                : <div className="w-full h-full flex items-center justify-center text-xl">{p.emoji}</div>
+                              }
+                            </div>
                             <div>
                               <p className="text-white font-medium">{p.name}</p>
                               <p className="text-slate-600 text-xs line-clamp-1">{p.description}</p>
