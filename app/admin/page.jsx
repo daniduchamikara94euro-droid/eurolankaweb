@@ -407,13 +407,21 @@ function ProductForm({ initial, onSave, onCancel, allProducts }) {
   const [form, setForm] = useState(initial || BLANK_PRODUCT)
   const [customCategory, setCustomCategory] = useState('')
   const [useCustom, setUseCustom] = useState(initial ? !CATEGORIES.includes(initial.category) : false)
+  const [formErrors, setFormErrors] = useState({})
 
-  const set = (field, val) => setForm(prev => ({ ...prev, [field]: val }))
+  const set = (field, val) => {
+    setForm(prev => ({ ...prev, [field]: val }))
+    if (formErrors[field]) setFormErrors(prev => ({ ...prev, [field]: '' }))
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault()
     const category = useCustom ? customCategory.trim() : form.category
-    if (!form.name.trim() || !category) return
+    const errors = {}
+    if (!form.name.trim()) errors.name = 'Product name is required'
+    if (!category) errors.category = 'Category is required'
+    if (Object.keys(errors).length) { setFormErrors(errors); return }
+    setFormErrors({})
     onSave({ ...form, category })
   }
 
@@ -425,14 +433,15 @@ function ProductForm({ initial, onSave, onCancel, allProducts }) {
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">
             <label className="block text-xs font-semibold text-slate-400 mb-1">Product Name *</label>
-            <input type="text" value={form.name} onChange={e => set('name', e.target.value)} required
-              className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-sky-500/60 transition-colors" />
+            <input type="text" value={form.name} onChange={e => set('name', e.target.value)}
+              className={`w-full px-4 py-2.5 rounded-xl bg-white/5 border text-white focus:outline-none focus:border-sky-500/60 transition-colors ${formErrors.name ? 'border-red-500/60' : 'border-white/10'}`} />
+            {formErrors.name && <p className="text-red-400 text-xs mt-1">{formErrors.name}</p>}
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-400 mb-1">Category *</label>
             {useCustom ? (
-              <input type="text" value={customCategory} onChange={e => setCustomCategory(e.target.value)} placeholder="Custom category"
-                className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-sky-500/60 transition-colors" />
+              <input type="text" value={customCategory} onChange={e => { setCustomCategory(e.target.value); if (formErrors.category) setFormErrors(p => ({...p, category: ''})) }} placeholder="Custom category"
+                className={`w-full px-4 py-2.5 rounded-xl bg-white/5 border text-white focus:outline-none focus:border-sky-500/60 transition-colors ${formErrors.category ? 'border-red-500/60' : 'border-white/10'}`} />
             ) : (
               <select value={form.category} onChange={e => set('category', e.target.value)}
                 className="w-full px-4 py-2.5 rounded-xl bg-[#0a1020] border border-white/10 text-white focus:outline-none focus:border-sky-500/60 transition-colors">
@@ -441,6 +450,7 @@ function ProductForm({ initial, onSave, onCancel, allProducts }) {
                 ))}
               </select>
             )}
+            {formErrors.category && <p className="text-red-400 text-xs mt-1">{formErrors.category}</p>}
             <button type="button" onClick={() => { setUseCustom(!useCustom); setCustomCategory('') }}
               className="text-xs text-sky-400 mt-1 hover:text-sky-300 transition-colors">
               {useCustom ? '← Use existing' : '+ Custom category'}
