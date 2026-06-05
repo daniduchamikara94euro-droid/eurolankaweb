@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+dev-dist/
+build/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Uploads (runtime files)
+uploads/
+
+# Prisma
+prisma/migrations/
+
+# Euro Lanka Web (separate project, out of scope)
+../../vscode/euro_lanka_web/

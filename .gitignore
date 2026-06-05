@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+dev-dist/
+build/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads (runtime)
+uploads/
+
+# IDE
+.idea/
+
+# Vscode projects (separate, not tracked here)
+Documents/vscode/
