@@ -35,22 +35,24 @@
         .section-heading { text-align: center; padding: 60px 20px 30px; }
         .section-heading h2 { color: #303F95; }
 
-        /* ----- HEADER ----- */
+        /* ----- HEADER — GLASSMORPHISM ----- */
         .site-header {
             position: fixed; top: 0; left: 0; width: 100%;
-            background: rgba(255,255,255,0.85);
-            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            background: rgba(255,255,255,0.55);
+            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
             z-index: 1000;
-            box-shadow: 0 1px 0 rgba(0,0,0,0.06);
+            border-bottom: 1px solid rgba(255,255,255,0.6);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.8);
             padding: 10px 20px;
             transform: translateY(-100%);
             animation: headerSlideDown 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards;
-            transition: box-shadow 0.4s, background 0.4s;
+            transition: box-shadow 0.4s, background 0.4s, border-color 0.4s;
         }
         .site-header.scrolled {
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+            background: rgba(255,255,255,0.72);
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border-bottom-color: rgba(255,255,255,0.8);
+            box-shadow: 0 4px 30px rgba(0,0,0,0.04), 0 1px 0 rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.9);
         }
         @keyframes headerSlideDown {
             from { transform: translateY(-100%); opacity: 0; }
@@ -218,11 +220,11 @@
         }
         .hero-glass-card {
             width: 100%; max-width: 420px;
-            background: rgba(255,255,255,0.5);
-            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255,255,255,0.7);
+            background: rgba(255,255,255,0.35);
+            backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px);
+            border: 1px solid rgba(255,255,255,0.5);
             border-radius: 20px; padding: 32px 28px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.04), 0 0 0 1px rgba(255,255,255,0.3), inset 0 1px 0 rgba(255,255,255,0.7);
             transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
         }
         .hero-glass-card:hover { transform: translateY(-6px); }
@@ -334,9 +336,9 @@
             gap: 24px; max-width: 1200px; margin: 40px auto 0; padding: 0 20px;
         }
         .industry-card {
-            background: rgba(255,255,255,0.7);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.8);
+            background: rgba(255,255,255,0.45);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.5);
             padding: 28px 18px; border-radius: 14px;
             text-align: center;
             box-shadow: 0 4px 20px rgba(0,0,0,0.04);
@@ -367,8 +369,9 @@
         }
         .capability-card {
             text-align: center; padding: 40px 24px;
-            background: rgba(247,248,250,0.5);
-            border: 1px solid rgba(0,0,0,0.04);
+            background: rgba(255,255,255,0.4);
+            backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255,255,255,0.5);
             border-radius: 16px;
             transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
         }
@@ -399,9 +402,9 @@
         }
         .team-card {
             text-align: center; padding: 32px 20px 28px;
-            background: rgba(255,255,255,0.8);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255,255,255,0.5);
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.04);
             transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
@@ -443,8 +446,9 @@
             gap: 24px; max-width: 1200px; margin: 40px auto 0; padding: 0 20px;
         }
         .service-card {
-            background: rgba(247,248,250,0.5);
-            border: 1px solid rgba(0,0,0,0.04);
+            background: rgba(255,255,255,0.4);
+            backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255,255,255,0.5);
             border-radius: 16px; overflow: hidden;
             transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
             display: flex; flex-direction: column;
@@ -499,11 +503,11 @@
         }
         .contact-form-wrapper {
             flex: 1;
-            background: rgba(255,255,255,0.75);
-            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.45);
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255,255,255,0.5);
             padding: 32px; border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.04);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.03), 0 0 0 1px rgba(255,255,255,0.3);
         }
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; font-size: 13px; color: #555; margin-bottom: 5px; font-weight: 600; }
