@@ -1,0 +1,504 @@
+{
+  "exported_at": "2026-07-18",
+  "source": "Upstash Redis KV",
+  "total_products": 23,
+  "products": [
+    {
+      "name": "Hinges",
+      "category": "Hinges",
+      "emoji": "",
+      "price": "Rs.175",
+      "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777457486828-4fnnndfazm.jpg",
+      "description": "",
+      "variants": [
+        {
+          "name": "Cup Size",
+          "type": "size",
+          "options": [
+            {
+              "colors": [],
+              "value": "12mm",
+              "price": "",
+              "disabled": true
+            },
+            {
+              "colors": [],
+              "value": "15mm",
+              "price": "",
+              "disabled": false
+            }
+          ]
+        }
+      ],
+      "id": 1
+    },
+    {
+      "name": "Drawer Locks ",
+      "category": "Locks",
+      "emoji": "",
+      "price": "Rs.300",
+      "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1774616998562-aeg5usnejzk.jpg",
+      "description": "",
+      "variants": [
+        {
+          "name": "Brand",
+          "type": "color",
+          "options": [
+            {
+              "label": "XiaoBoshi",
+              "hex": "#888888",
+              "img": "",
+              "price": "",
+              "disabled": false
+            }
+          ]
+        }
+      ],
+      "id": 2
+    },
+    {
+      "name": "Edge Band",
+      "category": "Edge Band",
+      "emoji": "??",
+      "price": "Rs.4500",
+      "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777458496430-7lc79vefa13.jpg",
+      "description": "",
+      "variants": [
+        {
+          "name": "Size",
+          "type": "size",
+          "options": [
+            {
+              "colors": [
+                {
+                  "label": "EL9701",
+                  "hex": "#5d1818",
+                  "price": "",
+                  "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777459519034-1tjp0w4s7j9.jpg",
+                  "disabled": false
+                },
+                {
+                  "label": "EL9703",
+                  "hex": "#921c1c",
+                  "price": "",
+                  "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777459380008-qfy5i77xd28.jpg",
+                  "disabled": false
+                },
+                {
+                  "label": "Natural Maho",
+                  "hex": "#231a1a",
+                  "price": "",
+                  "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777459306362-53dkl9mjkwg.jpg",
+                  "disabled": false
+                },
+                {
+                  "label": "Jungle Teak",
+                  "hex": "#420000",
+                  "price": "",
+                  "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777459457923-z8soh1jum3o.jpg",
+                  "disabled": false
+                },
+                {
+                  "label": "EL9707",
+                  "hex": "#514d4d",
+                  "price": "",
+                  "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777394303876-i2fko88zaj.jpg",
+                  "disabled": false
+                },
+                {
+                  "label": "Black",
+                  "hex": "#000000",
+                  "price": "",
+                  "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777777446316-42uj381c8q2.jpg",
+                  "disabled": false
+                },
+                {
+                  "label": "Blue",
+                  "hex": "#0059b8",
+                  "price": "",
+                  "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777459569546-99lbtofgfk.jpg",
+                  "disabled": false
+                },
+                {
+                  "label": "Pink",
+                  "hex": "#79003e",
+                  "price": "",
+                  "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777777436247-pnlm0uuuylm.jpg",
+                  "disabled": false
+                },
+                {
+                  "label": "White",
+                  "hex": "#ffffff",
+                  "price": "",
+                  "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777459557745-1pejw9abwxd.jpg",
+                  "disabled": false
+                }
+              ],
+              "value": "19 mm",
+              "price": "3750",
+              "disabled": false
+            },
+            {
+              "colors": [
+                {
+                  "label": "Jungle Teak",
+                  "hex": "",
+                  "price": "",
+                  "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777777566549-hxmlsfpw3ek.jpg",
+                  "disabled": false
+                }
+              ],
+              "value": "26 mm",
+              "price": "",
+              "disabled": false
+            },
+            {
+              "colors": [
+                {
+                  "label": "Jungle Teak",
+                  "hex": "",
+                  "price": "",
+                  "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777394411665-zsnunzbg6d9.jpg",
+                  "disabled": false
+                },
+                {
+                  "label": "Natural Maho",
+                  "hex": "",
+                  "price": "",
+                  "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777394402476-j49usrnhab.jpg",
+                  "disabled": false
+                }
+              ],
+              "value": "33 mm",
+              "price": "",
+              "disabled": false
+            }
+          ]
+        }
+      ],
+      "id": 3
+    },
+    {
+      "name": "Hot Melt Adhesive Glue",
+      "category": "Glue",
+      "emoji": "",
+      "price": "Rs.1100+",
+      "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1774617937143-oyrwsb9r84.jpg",
+      "description": "",
+      "variants": [
+        {
+          "name": "Color",
+          "type": "color",
+          "options": [
+            {
+              "label": "White",
+              "hex": "#ffffff",
+              "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1774618090390-0e582szowld8.jpg",
+              "price": "",
+              "disabled": false
+            },
+            {
+              "label": "Brown",
+              "hex": "#401c00",
+              "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1774618097686-t7x2v8136u.jpg",
+              "price": "",
+              "disabled": false
+            }
+          ]
+        }
+      ],
+      "id": 4
+    },
+    {
+      "name": "Tube Handle",
+      "category": "Handles",
+      "emoji": "??",
+      "price": "",
+      "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1776746900594-x29wc8ijikr.jpg",
+      "description": "",
+      "variants": [
+        {
+          "name": "Size",
+          "type": "size",
+          "options": [
+            {
+              "colors": [],
+              "value": "4 inch",
+              "price": "",
+              "disabled": false
+            },
+            {
+              "colors": [],
+              "value": "6 inch",
+              "price": "",
+              "disabled": false
+            },
+            {
+              "colors": [],
+              "value": "8 inch",
+              "price": "",
+              "disabled": false
+            }
+          ]
+        }
+      ],
+      "id": 5
+    },
+    {
+      "name": "L Brackets",
+      "category": "Fittings",
+      "emoji": "",
+      "price": "",
+      "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777393206165-rzp71xxj8hk.jpg",
+      "description": "",
+      "variants": [],
+      "id": 6
+    },
+    {
+      "name": "Lock Strike Plate",
+      "category": "Fittings",
+      "emoji": "??",
+      "price": "",
+      "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777461289082-cpxa2lf8976.jpg",
+      "description": "",
+      "variants": [],
+      "id": 7
+    },
+    {
+      "name": "Railings",
+      "category": "Fittings",
+      "emoji": "??",
+      "price": "",
+      "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777393341635-2up6yf2x4ab.jpg",
+      "description": "",
+      "variants": [
+        {
+          "name": "Size",
+          "type": "size",
+          "options": [
+            {
+              "colors": [],
+              "value": "12 mm",
+              "price": "",
+              "disabled": false
+            },
+            {
+              "colors": [],
+              "value": "14 mm",
+              "price": "",
+              "disabled": true
+            }
+          ]
+        }
+      ],
+      "id": 8
+    },
+    {
+      "name": "Fine Thread Drywall Screws",
+      "category": "Fittings",
+      "emoji": "??",
+      "price": "",
+      "img": "",
+      "description": "",
+      "variants": [],
+      "id": 9
+    },
+    {
+      "name": "Batton Bracket",
+      "category": "Fittings",
+      "emoji": "",
+      "price": "",
+      "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777393561164-i0yv95nkm0a.jpg",
+      "description": "",
+      "variants": [],
+      "id": 10
+    },
+    {
+      "name": "Roller Catcher",
+      "category": "Fittings",
+      "emoji": "",
+      "price": "",
+      "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777393642764-qojmmdzijs.jpg",
+      "description": "",
+      "variants": [],
+      "id": 11
+    },
+    {
+      "name": "Knobs",
+      "category": "Fittings",
+      "emoji": "??",
+      "price": "",
+      "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777393704813-bckluxdq934.jpg",
+      "description": "",
+      "variants": [
+        {
+          "name": "Color ",
+          "type": "color",
+          "options": [
+            {
+              "label": "ELKN9304",
+              "hex": "#832c00",
+              "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777458313596-24r9qgt929l.jpg",
+              "price": "",
+              "disabled": false
+            },
+            {
+              "label": "ELKN9305",
+              "hex": "#904100",
+              "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777458455031-25izzzkoj5cj.jpg",
+              "price": "",
+              "disabled": false
+            }
+          ]
+        }
+      ],
+      "id": 12
+    },
+    {
+      "name": "Magnet",
+      "category": "Fittings",
+      "emoji": "",
+      "price": "",
+      "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777458996686-kcehhi3q1hl.jpg",
+      "description": "",
+      "variants": [
+        {
+          "name": "Magnet",
+          "type": "color",
+          "options": [
+            {
+              "label": "ELMG6201",
+              "hex": "#888888",
+              "img": "",
+              "price": "",
+              "disabled": false
+            }
+          ]
+        }
+      ],
+      "id": 14
+    },
+    {
+      "name": "Plastic Handles",
+      "category": "Handles",
+      "emoji": "",
+      "price": "",
+      "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777777685186-u0kq2w1v1ca.jpg",
+      "description": "",
+      "variants": [],
+      "id": 15
+    },
+    {
+      "name": "Glass Magent Hinges",
+      "category": "Hinges",
+      "emoji": "",
+      "price": "",
+      "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777394060620-5kfn4gf7n9p.jpg",
+      "description": "",
+      "variants": [
+        {
+          "name": "Magenet",
+          "type": "color",
+          "options": [
+            {
+              "label": "Single",
+              "hex": "#888888",
+              "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777458603191-6h3c49283e.jpg",
+              "price": "",
+              "disabled": false
+            },
+            {
+              "label": "Double",
+              "hex": "#888888",
+              "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777458626621-yavv7l7squm.jpg",
+              "price": "",
+              "disabled": false
+            }
+          ]
+        }
+      ],
+      "id": 16
+    },
+    {
+      "name": "Edge Band Trimmer",
+      "category": "Tools",
+      "emoji": "",
+      "price": "",
+      "img": "https://olkbtlvqwmvuwizi.public.blob.vercel-storage.com/products/1777394544884-739lcbtjq7q.jpg",
+      "description": "",
+      "variants": [],
+      "id": 17
+    },
+    {
+      "name": "Heavy Duty One Hall Puncher",
+      "category": "Tools",
+      "emoji": "??",
+      "price": "",
+      "img": "",
+      "description": "",
+      "variants": [],
+      "id": 18
+    },
+    {
+      "name": "Staple Pins",
+      "category": "Tools",
+      "emoji": "??",
+      "price": "",
+      "img": "",
+      "description": "",
+      "variants": [],
+      "id": 19
+    },
+    {
+      "name": "U Pins",
+      "category": "Tools",
+      "emoji": "??",
+      "price": "",
+      "img": "",
+      "description": "",
+      "variants": [],
+      "id": 20
+    },
+    {
+      "name": "Wrapping Polythene",
+      "category": "Polythene",
+      "emoji": "??",
+      "price": "",
+      "img": "",
+      "description": "",
+      "variants": [],
+      "id": 21
+    },
+    {
+      "name": "Heat Polythene",
+      "category": "Polythene",
+      "emoji": "??",
+      "price": "",
+      "img": "",
+      "description": "",
+      "variants": [],
+      "id": 22
+    },
+    {
+      "name": "Diamond Tip Saw Blade",
+      "category": "Tools",
+      "emoji": "??",
+      "price": "",
+      "img": "",
+      "description": "",
+      "variants": [],
+      "id": 23
+    },
+    {
+      "name": "Tungsten Saw Blade",
+      "category": "Tools",
+      "emoji": "??",
+      "price": "",
+      "img": "",
+      "description": "",
+      "variants": [],
+      "id": 24
+    }
+  ],
+  "featured": []
+}
